@@ -10,10 +10,9 @@ This repository contains the backend and frontend of a reactive web application 
 
 ## Technologies Used
 
-- **Spring Boot** for backend services
-- **React** for the frontend
+- **Spring Boot** for backend services 
 - **WebFlux** for reactive programming
-- **MongoDB** for database management
+- **H2** for database management
 - **Maven** for project management
 
 ## Setup
