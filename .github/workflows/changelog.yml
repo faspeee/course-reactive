@@ -1,0 +1,26 @@
+name: Generate Changelog
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  generate_changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install git-chglog
+        run: |
+          curl -sSL https://github.com/git-chglog/git-chglog/releases/download/v0.9.0/git-chglog_0.9.0_Linux_x86_64.tar.gz | tar -xz
+          sudo mv git-chglog /usr/local/bin/
+      - name: Generate Changelog
+        run: |
+          git-chglog -o CHANGELOG.md
+      - name: Commit and push CHANGELOG.md
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add CHANGELOG.md
+          git commit -m 'Update CHANGELOG.md'
+          git push
