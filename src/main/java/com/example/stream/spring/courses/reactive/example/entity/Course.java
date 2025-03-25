@@ -1,29 +1,67 @@
 package com.example.stream.spring.courses.reactive.example.entity;
 
 
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
+import java.util.List;
+import lombok.*;
 
-@Table(name = "course")
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table("course")
 public class Course {
+
   @Id
   private Long id;
-  @Column(value = "courseName")
+
+  @NotBlank
+  @Size(max = 100)
+  @Column("course_name")
   private String courseName;
-  @Column(value = "courseCode")
+
+  @NotBlank
+  @Size(max = 50)
+  @Column("course_code")
   private String courseCode;
-  @Column(value = "startDate")
+
+  @Column("start_date")
   private LocalDate startDate;
-  @Column(value = "endDate")
+
+  @Column("end_date")
   private LocalDate endDate;
-  @Column(value = "creditHours")
+
+  @Column("credit_hours")
   private int creditHours;
+
+  @Size(max = 500)
+  @Column("description")
+  private String description;
+
+  @NotBlank
+  @Column("instructor")
+  private String instructor;
+
+  @Column("is_active")
+  private boolean isActive = true;
+
+  @NotNull
+  @Column("department_id")
+  private Long departmentId;
+
+  @Transient
+  private List<Long> studentIds;  // Loaded separately in service
+
+  @Transient
+  private List<Long> prerequisiteIds; // Loaded separately in service
 }
+
 

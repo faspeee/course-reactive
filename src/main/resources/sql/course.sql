@@ -1,111 +1,93 @@
-CREATE TABLE course
-(
-  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  courseName  VARCHAR(255) NOT NULL,
-  courseCode  VARCHAR(50)  NOT NULL UNIQUE,
-  startDate   DATE         NOT NULL,
-  endDate     DATE         NOT NULL,
-  creditHours INT          NOT NULL CHECK (creditHours > 0)
+CREATE TABLE student (
+                         id BIGINT PRIMARY KEY,
+                         name VARCHAR(100) NOT NULL,
+                         email VARCHAR(100) NOT NULL,
+                         created_at TIMESTAMP,
+                         updated_at TIMESTAMP,
+                         version BIGINT
 );
 
-INSERT INTO course (courseName, courseCode, startDate, endDate, creditHours)
-VALUES ('Introduction to Programming', 'CS101', '2025-01-10', '2025-05-20', 3),
-       ('Data Structures', 'CS102', '2025-01-15', '2025-05-25', 4),
-       ('Algorithms', 'CS201', '2025-01-20', '2025-05-30', 3),
-       ('Operating Systems', 'CS301', '2025-02-01', '2025-06-10', 3),
-       ('Database Management', 'CS202', '2025-02-10', '2025-06-15', 3),
-       ('Computer Networks', 'CS303', '2025-02-15', '2025-06-20', 4),
-       ('Artificial Intelligence', 'CS401', '2025-03-01', '2025-07-10', 3),
-       ('Machine Learning', 'CS402', '2025-03-05', '2025-07-15', 3),
-       ('Cyber Security', 'CS404', '2025-03-10', '2025-07-20', 3),
-       ('Cloud Computing', 'CS405', '2025-03-15', '2025-07-25', 4),
-       ('Software Engineering', 'CS406', '2025-03-20', '2025-07-30', 3),
-       ('Distributed Systems', 'CS407', '2025-03-25', '2025-08-05', 4),
-       ('Embedded Systems', 'CS408', '2025-04-01', '2025-08-10', 3),
-       ('Parallel Computing', 'CS409', '2025-04-05', '2025-08-15', 3),
-       ('Quantum Computing', 'CS410', '2025-04-10', '2025-08-20', 3),
-       ('Computer Graphics', 'CS411', '2025-04-15', '2025-08-25', 4),
-       ('Blockchain Technology', 'CS412', '2025-04-20', '2025-08-30', 3),
-       ('Internet of Things', 'CS413', '2025-04-25', '2025-09-05', 3),
-       ('Digital Forensics', 'CS414', '2025-05-01', '2025-09-10', 3),
-       ('Game Development', 'CS415', '2025-05-05', '2025-09-15', 4),
-       ('Computer Vision', 'CS416', '2025-05-10', '2025-09-20', 3),
-       ('Bioinformatics', 'CS417', '2025-05-15', '2025-09-25', 3),
-       ('Neural Networks', 'CS418', '2025-05-20', '2025-09-30', 4),
-       ('Robotics', 'CS419', '2025-05-25', '2025-10-05', 3),
-       ('Big Data Analytics', 'CS420', '2025-06-01', '2025-10-10', 3),
-       ('Web Development', 'CS421', '2025-06-05', '2025-10-15', 4),
-       ('Mobile App Development', 'CS422', '2025-06-10', '2025-10-20', 3),
-       ('Software Testing', 'CS423', '2025-06-15', '2025-10-25', 3),
-       ('DevOps', 'CS424', '2025-06-20', '2025-10-30', 4),
-       ('Human-Computer Interaction', 'CS425', '2025-06-25', '2025-11-05', 3),
-       ('Ethical Hacking', 'CS426', '2025-07-01', '2025-11-10', 3),
-       ('Augmented Reality', 'CS427', '2025-07-05', '2025-11-15', 4),
-       ('Virtual Reality', 'CS428', '2025-07-10', '2025-11-20', 3),
-       ('Embedded AI', 'CS429', '2025-07-15', '2025-11-25', 3),
-       ('Software Project Management', 'CS430', '2025-07-20', '2025-11-30', 3),
-       ('Data Mining', 'CS431', '2025-07-25', '2025-12-05', 4),
-       ('Natural Language Processing', 'CS432', '2025-08-01', '2025-12-10', 3),
-       ('Autonomous Systems', 'CS433', '2025-08-05', '2025-12-15', 3),
-       ('IoT Security', 'CS434', '2025-08-10', '2025-12-20', 3),
-       ('Advanced Cryptography', 'CS435', '2025-08-15', '2025-12-25', 4),
-       ('Deep Learning', 'CS436', '2025-08-20', '2025-12-30', 3),
-       ('Financial Computing', 'CS437', '2025-08-25', '2026-01-05', 3),
-       ('Quantum Machine Learning', 'CS438', '2025-09-01', '2026-01-10', 4),
-       ('Computer Architecture', 'CS439', '2025-09-05', '2026-01-15', 3),
-       ('Mathematical Foundations of AI', 'CS440', '2025-09-10', '2026-01-20', 3),
-       ('Geographic Information Systems', 'CS441', '2025-09-15', '2026-01-25', 3),
-       ('Advanced Mobile Computing', 'CS442', '2025-09-20', '2026-01-30', 4),
-       ('Advanced Robotics', 'CS443', '2025-09-25', '2026-02-05', 3),
-       ('Quantum Cryptography', 'CS444', '2025-10-01', '2026-02-10', 3),
-       ('Biomedical Informatics', 'CS445', '2025-10-05', '2026-02-15', 3),
-       ('Software Architecture', 'CS446', '2025-10-10', '2026-02-20', 3),
-       ('Advanced Software Engineering', 'CS447', '2025-10-15', '2026-02-25', 3),
-       ('Cloud Security', 'CS448', '2025-10-20', '2026-03-01', 4),
-       ('Computer Ethics', 'CS449', '2025-10-25', '2026-03-05', 3),
-       ('High Performance Computing', 'CS450', '2025-11-01', '2026-03-10', 4),
-       ('Multimedia Computing', 'CS451', '2025-11-05', '2026-03-15', 3),
-       ('Computational Neuroscience', 'CS452', '2025-11-10', '2026-03-20', 3),
-       ('Graph Theory and Computing', 'CS453', '2025-11-15', '2026-03-25', 3),
-       ('Edge Computing', 'CS454', '2025-11-20', '2026-03-30', 4),
-       ('AI Ethics and Bias', 'CS455', '2025-11-25', '2026-04-05', 3),
-       ('Social Network Analysis', 'CS456', '2025-12-01', '2026-04-10', 3),
-       ('Ubiquitous Computing', 'CS457', '2025-12-05', '2026-04-15', 3),
-       ('AI for Healthcare', 'CS458', '2025-12-10', '2026-04-20', 4),
-       ('Data Ethics and Privacy', 'CS459', '2025-12-15', '2026-04-25', 3),
-       ('Human-Robot Interaction', 'CS460', '2025-12-20', '2026-04-30', 3),
-       ('Digital Signal Processing', 'CS461', '2025-12-25', '2026-05-05', 4),
-       ('Haptic Technology', 'CS462', '2026-01-01', '2026-05-10', 3),
-       ('Smart Grid Technologies', 'CS463', '2026-01-05', '2026-05-15', 3),
-       ('AI in Finance', 'CS464', '2026-01-10', '2026-05-20', 3),
-       ('Advanced Compiler Design', 'CS465', '2026-01-15', '2026-05-25', 4),
-       ('AI for Autonomous Vehicles', 'CS466', '2026-01-20', '2026-05-30', 3),
-       ('Computer Algebra Systems', 'CS467', '2026-01-25', '2026-06-05', 3),
-       ('Scientific Computing', 'CS468', '2026-02-01', '2026-06-10', 3),
-       ('Advanced Web Technologies', 'CS469', '2026-02-05', '2026-06-15', 4),
-       ('Semantic Web', 'CS470', '2026-02-10', '2026-06-20', 3),
-       ('Game AI', 'CS471', '2026-02-15', '2026-06-25', 3),
-       ('Data Visualization', 'CS472', '2026-02-20', '2026-06-30', 3),
-       ('Digital Twins', 'CS473', '2026-02-25', '2026-07-05', 4),
-       ('Wearable Computing', 'CS474', '2026-03-01', '2026-07-10', 3),
-       ('AI and Creativity', 'CS475', '2026-03-05', '2026-07-15', 3),
-       ('Computational Biology', 'CS476', '2026-03-10', '2026-07-20', 3),
-       ('Blockchain Security', 'CS477', '2026-03-15', '2026-07-25', 4),
-       ('AI-powered Chatbots', 'CS478', '2026-03-20', '2026-07-30', 3),
-       ('Voice Recognition Systems', 'CS479', '2026-03-25', '2026-08-05', 3),
-       ('Digital Image Processing', 'CS480', '2026-04-01', '2026-08-10', 3),
-       ('Speech Processing', 'CS481', '2026-04-05', '2026-08-15', 4),
-       ('Cyber-Physical Systems', 'CS482', '2026-04-10', '2026-08-20', 3),
-       ('AI in Manufacturing', 'CS483', '2026-04-15', '2026-08-25', 3),
-       ('AI in Smart Cities', 'CS484', '2026-04-20', '2026-08-30', 3),
-       ('Augmentative and Assistive Technology', 'CS485', '2026-04-25', '2026-09-05', 4),
-       ('Cognitive Computing', 'CS486', '2026-05-01', '2026-09-10', 3),
-       ('AI for Social Good', 'CS487', '2026-05-05', '2026-09-15', 3),
-       ('Neurosymbolic AI', 'CS488', '2026-05-10', '2026-09-20', 3),
-       ('AI-driven Drug Discovery', 'CS489', '2026-05-15', '2026-09-25', 4),
-       ('Explainable AI', 'CS490', '2026-05-20', '2026-09-30', 3),
-       ('AI in Education', 'CS491', '2026-05-25', '2026-10-05', 3),
-       ('AI for Space Exploration', 'CS492', '2026-06-01', '2026-10-10', 3),
-       ('AI for Agriculture', 'CS493', '2026-06-05', '2026-10-15', 4),
-       ('AI-powered Robotics', 'CS494', '2026-06-10', '2026-10-20', 3),
-       ('Advanced AI Techniques', 'CS495', '2026-06-15', '2026-10-25', 3);
+-- Sample data for students
+INSERT INTO student (id, name, email, created_at, updated_at, version) VALUES
+                                                                           (1, 'Alice Smith', 'alice@example.com', NOW(), NOW(), 1),
+                                                                           (2, 'Bob Johnson', 'bob@example.com', NOW(), NOW(), 1);
+CREATE TABLE department (
+                            id BIGINT PRIMARY KEY,
+                            name VARCHAR(100) NOT NULL,
+                            description VARCHAR(500),
+                            created_at TIMESTAMP,
+                            updated_at TIMESTAMP,
+                            version BIGINT
+);
+
+-- Sample data for departments
+INSERT INTO department (id, name, description, created_at, updated_at, version) VALUES
+                                                                                    (1, 'Computer Science', 'Department of Computer Science', NOW(), NOW(), 1),
+                                                                                    (2, 'Mathematics', 'Department of Mathematics', NOW(), NOW(), 1);
+
+CREATE TABLE course (
+                        id BIGINT PRIMARY KEY,
+                        course_name VARCHAR(100),
+                        course_code VARCHAR(50),
+                        start_date DATE,
+                        end_date DATE,
+                        credit_hours INT,
+                        description VARCHAR(500),
+                        instructor VARCHAR(100) NOT NULL,  -- could later be linked to the instructor table
+                        is_active BOOLEAN DEFAULT TRUE,
+                        department_id BIGINT NOT NULL,
+                        FOREIGN KEY (department_id) REFERENCES department(id)
+);
+
+-- Sample data for courses
+INSERT INTO course (id, course_name, course_code, start_date, end_date, credit_hours, description, instructor, is_active, department_id)
+VALUES
+    (1, 'Introduction to Programming', 'CS101', '2025-01-15', '2025-05-15', 3, 'Basics of programming', 'Dr. Jane Doe', TRUE, 1),
+    (2, 'Data Structures', 'CS201', '2025-01-15', '2025-05-15', 3, 'Advanced programming concepts', 'Dr. John Smith', TRUE, 1),
+    (3, 'Calculus I', 'MATH101', '2025-01-15', '2025-05-15', 4, 'Differential and integral calculus', 'Dr. Emily Brown', TRUE, 2);
+CREATE TABLE enrollment (
+                            student_id BIGINT NOT NULL,
+                            course_id BIGINT NOT NULL,
+                            enrolled_at TIMESTAMP DEFAULT NOW(),
+                            PRIMARY KEY (student_id, course_id),
+                            FOREIGN KEY (student_id) REFERENCES student(id),
+                            FOREIGN KEY (course_id) REFERENCES course(id)
+);
+
+-- Sample enrollment data
+INSERT INTO enrollment (student_id, course_id)
+VALUES
+    (1, 1),
+    (1, 2),
+    (2, 1),
+    (2, 3);
+
+CREATE TABLE course_prerequisite (
+                                     course_id BIGINT NOT NULL,
+                                     prerequisite_id BIGINT NOT NULL,
+                                     PRIMARY KEY (course_id, prerequisite_id),
+                                     FOREIGN KEY (course_id) REFERENCES course(id),
+                                     FOREIGN KEY (prerequisite_id) REFERENCES course(id)
+);
+
+-- Sample data: Course 2 (Data Structures) requires Course 1 (Introduction to Programming)
+INSERT INTO course_prerequisite (course_id, prerequisite_id)
+VALUES
+    (2, 1);
+CREATE TABLE instructor (
+                            id BIGINT PRIMARY KEY,
+                            name VARCHAR(100) NOT NULL,
+                            email VARCHAR(100) NOT NULL,
+                            department_id BIGINT,
+                            created_at TIMESTAMP,
+                            updated_at TIMESTAMP,
+                            version BIGINT,
+                            FOREIGN KEY (department_id) REFERENCES department(id)
+);
+
+-- Sample instructor data
+INSERT INTO instructor (id, name, email, department_id, created_at, updated_at, version)
+VALUES
+    (1, 'Dr. Jane Doe', 'jane.doe@example.com', 1, NOW(), NOW(), 1),
+    (2, 'Dr. John Smith', 'john.smith@example.com', 1, NOW(), NOW(), 1),
+    (3, 'Dr. Emily Brown', 'emily.brown@example.com', 2, NOW(), NOW(), 1);
