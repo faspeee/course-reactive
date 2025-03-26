@@ -3,6 +3,8 @@ package com.example.stream.spring.courses.reactive.example.controller;
 import com.example.stream.spring.courses.reactive.example.model.CourseDto;
 import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,8 +29,10 @@ public class CourseController {
     }
 
     @PostMapping("/addCourse")
-    public Mono<CourseDto> addCourse(@RequestBody CourseDto courseDto) {
-        return courseService.addCourse(courseDto);
+    public ResponseEntity<Mono<CourseDto>> addCourse(@RequestBody CourseDto courseDto) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(courseService.addCourse(courseDto));
     }
 
     @DeleteMapping("/deleteCourse")

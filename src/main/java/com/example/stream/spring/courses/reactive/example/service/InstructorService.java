@@ -14,7 +14,7 @@ import reactor.core.publisher.Flux;
  * Service class for handling business logic related to teachers.
  */
 @Service
-public class TeacherService {
+public class InstructorService {
 
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
@@ -29,10 +29,10 @@ public class TeacherService {
      * @param studentRepository    the repository for student data
      * @param studentConverter     the converter for transforming Student entities to DTOs
      */
-    public TeacherService(CourseRepository courseRepository,
-                          EnrollmentRepository enrollmentRepository,
-                          StudentRepository studentRepository,
-                          StudentConverter studentConverter) {
+    public InstructorService(CourseRepository courseRepository,
+                             EnrollmentRepository enrollmentRepository,
+                             StudentRepository studentRepository,
+                             StudentConverter studentConverter) {
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.studentRepository = studentRepository;
@@ -46,7 +46,7 @@ public class TeacherService {
      * @return a Flux containing StudentDTOs of the associated students
      */
     public Flux<StudentDTO> getStudentsByTeacherId(Long teacherId) {
-        return courseRepository.findByTeacherId(teacherId)
+        return courseRepository.findByInstructorId(teacherId)
                 .flatMap(course -> enrollmentRepository.findByCourseId(course.getId()))
                 .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId()))
                 .map(studentConverter::toDto)

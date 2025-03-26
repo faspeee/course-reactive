@@ -28,9 +28,6 @@ public class Instructor {
     @Column("email")
     private String email;
 
-    @Column("department_id")
-    private Long departmentId;
-
     @CreatedDate
     @Column("created_at")
     private LocalDateTime createdAt;

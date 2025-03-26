@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
-import com.example.stream.spring.courses.reactive.example.service.TeacherService;
+import com.example.stream.spring.courses.reactive.example.service.InstructorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,17 +18,17 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/teachers")
 @Tag(name = "Teacher Management", description = "Endpoints for managing teachers and their associated students")
-public class TeacherController {
+public class InstructorController {
 
-    private final TeacherService teacherService;
+    private final InstructorService instructorService;
 
     /**
      * Constructs a TeacherController with the specified TeacherService.
      *
-     * @param teacherService the service to handle teacher-related operations
+     * @param instructorService the service to handle teacher-related operations
      */
-    public TeacherController(TeacherService teacherService) {
-        this.teacherService = teacherService;
+    public InstructorController(InstructorService instructorService) {
+        this.instructorService = instructorService;
     }
 
     /**
@@ -47,6 +47,6 @@ public class TeacherController {
     })
     @GetMapping("/{teacherId}/students")
     public Flux<StudentDTO> getStudentsByTeacher(@PathVariable Long teacherId) {
-        return teacherService.getStudentsByTeacherId(teacherId);
+        return instructorService.getStudentsByTeacherId(teacherId);
     }
 }

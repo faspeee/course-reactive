@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 
 
 public interface CourseRepository extends ReactiveCrudRepository<Course, Long> {
-    Flux<Course> findByTeacherId(Long teacherId);
+    Flux<Course> findByInstructorId(Long teacherId);
 
 }
 

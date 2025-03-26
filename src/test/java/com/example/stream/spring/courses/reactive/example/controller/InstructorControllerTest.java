@@ -6,14 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * Unit tests for the TeacherController.
  */
-@WebFluxTest(TeacherController.class)
-public class TeacherControllerTest {
+@WebFluxTest(InstructorController.class)
+public class InstructorControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @Test
+    public void dummyTest() {
+        assertNotNull(webTestClient);
+    }
 
     /**
      * Tests the retrieval of students by teacher ID.

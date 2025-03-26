@@ -1,10 +1,15 @@
 package com.example.stream.spring.courses.reactive.example.entity;
 
-import lombok.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,7 +42,8 @@ public class Student {
     @LastModifiedDate
     @Column("updated_at")
     private LocalDateTime updatedAt;
-
+    @Column("freshman")
+    private String freshman;
     @Version
     @Column("version")
     private Long version;
