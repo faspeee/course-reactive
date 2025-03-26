@@ -2,6 +2,7 @@ package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.CourseDto;
 import com.example.stream.spring.courses.reactive.example.model.UniversityDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -78,6 +79,42 @@ public class UniversityControllerTest {
                     assertNotNull(createdUniversity.accreditation());
                     assertEquals("Springfield University", createdUniversity.name());
                 });
+    }
+
+    @DisplayName("add a university on city that not exist return error message")
+    @Test
+    public void add_university_error_test() {
+        UniversityDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+                LocalDate.of(1950, 9, 15), "Higher Learning Commission 2", "Dr. Jane Smith",
+                15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
+                "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
+                150.75, 10, 85, true, 120, LocalDateTime.now(),
+                LocalDateTime.now(), "ILLY", "AE");
+        // Set other properties as needed
+
+        webTestClient.post().uri("/university/addUniversity")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newUniversity)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @DisplayName("add a university on country that not exist return error message")
+    @Test
+    public void add_university_error_2_test() {
+        UniversityDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+                LocalDate.of(1950, 9, 15), "Higher Learning Commission 2", "Dr. Jane Smith",
+                15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
+                "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
+                150.75, 10, 85, true, 120, LocalDateTime.now(),
+                LocalDateTime.now(), "USA", "AE");
+        // Set other properties as needed
+
+        webTestClient.post().uri("/university/addUniversity")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newUniversity)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test

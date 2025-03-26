@@ -1,6 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.CampusDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,6 +67,32 @@ public class CampusControllerTest {
                     assertNotNull(createCampus.country());
                     assertEquals("Campus Maradona", createCampus.name());
                 });
+    }
+
+    @DisplayName("add campus on country that not exist return error")
+    @Test
+    public void add_campus_error_test() {
+        CampusDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L, LocalDateTime.now(), null, "Lavazza", "Napoli");
+        // Set other properties as needed
+
+        webTestClient.post().uri("/campus/addCampus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCampusDto)
+                .exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @DisplayName("add campus on city that not exist on the country return error")
+    @Test
+    public void add_campus_error_2_test() {
+        CampusDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L, LocalDateTime.now(), null, "Spain", "Napoli");
+        // Set other properties as needed
+
+        webTestClient.post().uri("/campus/addCampus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCampusDto)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test

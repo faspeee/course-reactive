@@ -1,6 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.CollegeDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,6 +67,19 @@ public class CollegeControllerTest {
                     assertNotNull(createdCollege.universityId());
                     assertEquals("John Doe", createdCollege.name());
                 });
+    }
+
+    @DisplayName("add college in university that not exist, return error")
+    @Test
+    public void add_college_error_test() {
+        CollegeDto newCollege = createCollegeDto("John Doe", "that is it", 2231L, LocalDateTime.now(), null);
+        // Set other properties as needed
+
+        webTestClient.post().uri("/college/addCollege")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCollege)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test

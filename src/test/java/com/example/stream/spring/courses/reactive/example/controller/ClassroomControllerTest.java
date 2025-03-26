@@ -1,6 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.ClassroomDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,6 +67,19 @@ public class ClassroomControllerTest {
                     assertNotNull(createdClassroom.capacity());
                     assertEquals(10, createdClassroom.capacity());
                 });
+    }
+
+    @DisplayName("add classroom on building that not exist return error")
+    @Test
+    public void add_classroom_error_test() {
+        ClassroomDto newClassroom = createClassroomDto(11111L, "XVI", 10, LocalDateTime.now(), null);
+        // Set other properties as needed
+
+        webTestClient.post().uri("/classroom/addDepartment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newClassroom)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test

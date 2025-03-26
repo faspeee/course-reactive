@@ -2,6 +2,7 @@ package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.BuildingDto;
 import com.example.stream.spring.courses.reactive.example.model.CourseDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,6 +63,18 @@ public class BuildingControllerTest {
                     assertNotNull(createBuilding.createdAt());
                     assertEquals("Carlos Filling X", createBuilding.name());
                 });
+    }
+
+    @DisplayName("adding building in campus that not exist return error")
+    @Test
+    public void add_building_error_test() {
+        BuildingDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 220L, LocalDateTime.now(), null);
+        // Set other properties as needed
+        webTestClient.post().uri("/building/addBuilding")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newBuilding)
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test
