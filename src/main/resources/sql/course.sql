@@ -3,6 +3,7 @@ CREATE TABLE student
 (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
+    surname    VARCHAR(100) NOT NULL,
     email      VARCHAR(100) NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
@@ -15,6 +16,8 @@ CREATE TABLE department
     id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
     description VARCHAR(500),
+    identifier  VARCHAR(50)  NOT NULL,
+    college_id  BIGINT       NOT NULL,
     created_at  TIMESTAMP,
     updated_at  TIMESTAMP,
     version     BIGINT
@@ -74,42 +77,138 @@ CREATE TABLE course_prerequisite
     FOREIGN KEY (course_id) REFERENCES course (id),
     FOREIGN KEY (prerequisite_id) REFERENCES course (id)
 );
+-- University Table
+CREATE TABLE university
+(
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    country       VARCHAR(50)  NOT NULL,
+    city          VARCHAR(50)  NOT NULL,
+    established   DATE,
+    accreditation VARCHAR(100),   -- Accreditation body or status
+    president     VARCHAR(100),   -- Current president or chancellor
+    student_count INT,            -- Number of enrolled students
+    website       VARCHAR(255),   -- Official website URL
+    contact_email VARCHAR(100),   -- General contact email address
+    phone_number  VARCHAR(20),    -- General contact phone number
+    motto         VARCHAR(255),   -- University motto or slogan
+    colors        VARCHAR(100),   -- Official university colors
+    mascot        VARCHAR(100),   -- University mascot
+    campus_area   DECIMAL(10, 2), -- Total campus area in acres or hectares
+    num_faculties INT,            -- Number of faculties or schools within the university
+    num_programs  INT,            -- Number of academic programs offered
+    international BOOLEAN,        -- Indicator if the university has international affiliations
+    ranking       INT,            -- National or international ranking position
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    version       BIGINT
+);
+-- Campus Table
+CREATE TABLE campus
+(
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    address       VARCHAR(255),
+    country       VARCHAR(50)  NOT NULL,
+    city          VARCHAR(50)  NOT NULL,
+    university_id BIGINT       NOT NULL,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    version       BIGINT,
+    FOREIGN KEY (university_id) REFERENCES university (id)
+);
 
-INSERT INTO department (name, description, created_at, updated_at, version)
-VALUES ('Computer Science', 'Department of Computer Science', NOW(), NOW(), 1),
-       ('Mathematics', 'Department of Mathematics', NOW(), NOW(), 1),
-       ('Physics', 'Department of Physics', NOW(), NOW(), 1);
+-- College Table
+CREATE TABLE college
+(
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    dean          VARCHAR(100),
+    university_id BIGINT       NOT NULL,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    version       BIGINT,
+    FOREIGN KEY (university_id) REFERENCES university (id)
+);
+
+-- Building Table
+CREATE TABLE building
+(
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name       VARCHAR(100)       NOT NULL,
+    code       VARCHAR(10) UNIQUE NOT NULL,
+    campus_id  BIGINT             NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    version    BIGINT,
+    FOREIGN KEY (campus_id) REFERENCES campus (id)
+);
+
+-- Classroom Table
+CREATE TABLE classroom
+(
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    building_id BIGINT      NOT NULL,
+    room_number VARCHAR(10) NOT NULL,
+    capacity    INT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    version     BIGINT,
+    FOREIGN KEY (building_id) REFERENCES building (id)
+);
+INSERT INTO university (name, location, established, accreditation, president, student_count, website, contact_email,
+                        phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs, international,
+                        ranking, version)
+VALUES ('Global Tech University', '123 University Ave, Tech City', '1965-09-01', 'ABET', 'Dr. Jane Smith', 15000,
+        'https://www.globaltech.edu', 'info@globaltech.edu', '+1-800-555-1234', 'Innovating the Future',
+        'Blue and Silver', 'Techie the Tiger', 500.00, 10, 100, TRUE, 25, 1);
+
+INSERT INTO campus (name, address, university_id, version)
+VALUES ('Main Campus', '123 University Ave, Tech City', 1, 1),
+       ('Downtown Campus', '456 City Center Blvd, Tech City', 1, 1);
+INSERT INTO college (name, dean, university_id, version)
+VALUES ('College of Engineering', 'Dr. Alan Turing', 1, 1),
+       ('College of Arts and Sciences', 'Dr. Marie Curie', 1, 1);
+INSERT INTO department (name, description, college_id, version)
+VALUES ('Computer Science', 'Focuses on the study of computer systems and computational processes.', 1, 1),
+       ('Electrical Engineering',
+        'Deals with the study and application of electricity, electronics, and electromagnetism.', 1, 1),
+       ('Biology', 'Explores the science of life and living organisms.', 2, 1);
+INSERT INTO building (name, code, campus_id, version)
+VALUES ('Engineering Hall', 'ENGH', 1, 1),
+       ('Science Building', 'SCIB', 1, 1),
+       ('Downtown Center', 'DTC', 2, 1);
+INSERT INTO classroom (building_id, room_number, capacity, version)
+VALUES (1, '101', 50, 1),
+       (1, '102', 30, 1),
+       (2, '201', 100, 1),
+       (3, '301', 40, 1);
 INSERT INTO instructor (name, email, created_at, updated_at, version)
-VALUES ('Dr. Alice Smith', 'alice.smith@university.edu', NOW(), NOW(), 1),
-       ('Dr. Bob Johnson', 'bob.johnson@university.edu', NOW(), NOW(), 1),
-       ('Dr. Carol Williams', 'carol.williams@university.edu', NOW(), NOW(), 1);
+VALUES ('Dr. Emily Johnson', 'e.johnson@globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+       ('Dr. Michael Brown', 'm.brown@globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+       ('Dr. Sarah Davis', 's.davis@globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1);
 INSERT INTO instructor_department (instructor_id, department_id)
-VALUES (1, 1), -- Dr. Alice Smith in Computer Science
-       (2, 2), -- Dr. Bob Johnson in Mathematics
-       (3, 3), -- Dr. Carol Williams in Physics
-       (1, 2); -- Dr. Alice Smith also in Mathematics
-INSERT INTO course (course_name, course_code, start_date, end_date, credit_hours, description, instructor_id,
-                    is_active, department_id)
-VALUES ('Introduction to Programming', 'CS101', '2025-09-01', '2025-12-15', 4, 'Basic programming concepts', 1, TRUE,
-        1),
-       ('Data Structures', 'CS201', '2025-09-01', '2025-12-15', 3, 'In-depth study of data structures', 1, TRUE, 1),
-       ('Calculus I', 'MATH101', '2025-09-01', '2025-12-15', 4, 'Differential and integral calculus', 2, TRUE, 2),
-       ('Linear Algebra', 'MATH201', '2025-09-01', '2025-12-15', 3, 'Matrix theory and linear algebra', 2, TRUE, 2),
-       ('Classical Mechanics', 'PHYS101', '2025-09-01', '2025-12-15', 4, 'Fundamentals of classical mechanics', 3,
-        TRUE, 3);
-
-INSERT INTO student (name, email, created_at, updated_at, freshman, version)
-VALUES ('John Doe', 'john.doe@student.edu', NOW(), NOW(), '2025', 1),
-       ('Jane Smith', 'jane.smith@student.edu', NOW(), NOW(), '2025', 1),
-       ('Emily Johnson', 'emily.johnson@student.edu', NOW(), NOW(), '2025', 1),
-       ('Michael Brown', 'michael.brown@student.edu', NOW(), NOW(), '2025', 1),
-       ('Sarah Davis', 'sarah.davis@student.edu', NOW(), NOW(), '2025', 1);
+VALUES (1, 1),
+       (2, 2),
+       (3, 3);
+INSERT INTO course (course_name, course_code, start_date, end_date, credit_hours, description, instructor_id, is_active,
+                    department_id)
+VALUES ('Introduction to Programming', 'CS101', '2025-09-01', '2025-12-15', 3,
+        'Basic concepts of programming using Python.', 1, TRUE, 1),
+       ('Circuit Analysis', 'EE201', '2025-09-01', '2025-12-15', 4,
+        'Study of electrical circuits and their components.', 2, TRUE, 2),
+       ('General Biology', 'BIO101', '2025-09-01', '2025-12-15', 3,
+        'Introduction to biological principles and concepts.', 3, TRUE, 3);
+INSERT INTO student (name, surname, email, created_at, updated_at, freshman, version)
+VALUES ('Alice', 'Williams', 'alice.williams@student.globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Yes', 1),
+       ('Bob', 'Miller', 'bob.miller@student.globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Yes', 1),
+       ('Charlie', 'Garcia', 'charlie.garcia@student.globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Yes', 1);
 INSERT INTO enrollment (student_id, course_id, enrolled_at)
-VALUES (1, 1, NOW()), -- John Doe in Introduction to Programming
-       (2, 1, NOW()), -- Jane Smith in Introduction to Programming
-       (3, 2, NOW()), -- Emily Johnson in Data Structures
-       (4, 3, NOW()), -- Michael Brown in Calculus I
-       (5, 4, NOW()); -- Sarah Davis in Linear Algebra
+VALUES (1, 1, CURRENT_TIMESTAMP),
+       (2, 2, CURRENT_TIMESTAMP),
+       (3, 3, CURRENT_TIMESTAMP),
+       (1, 2, CURRENT_TIMESTAMP),
+       (2, 3, CURRENT_TIMESTAMP);
 INSERT INTO course_prerequisite (course_id, prerequisite_id)
-VALUES (2, 1), -- Data Structures requires Introduction to Programming
-       (4, 3); -- Linear Algebra requires Calculus I
+VALUES (2, 1); -- Circuit Analysis requires Introduction to Programming as a prerequisite
+

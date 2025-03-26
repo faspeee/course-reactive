@@ -29,6 +29,11 @@ public class Student {
     @Size(min = 3, max = 100)
     @Column("name")
     private String name;
+    
+    @NotBlank
+    @Size(min = 3, max = 100)
+    @Column("name")
+    private String surname;
 
     @Email
     @NotBlank

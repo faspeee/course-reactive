@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
+import com.example.stream.spring.courses.reactive.example.model.StudentDto;
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +46,7 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}/students")
-    public Flux<StudentDTO> getStudentsByCourse(@PathVariable Long courseId) {
+    public Flux<StudentDto> getStudentsByCourse(@PathVariable Long courseId) {
         return courseService.getStudentsByCourseId(courseId);
     }
 }

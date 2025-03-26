@@ -1,13 +1,18 @@
 package com.example.stream.spring.courses.reactive.example.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.data.relational.core.mapping.Column;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
-import jakarta.validation.constraints.*;
-import lombok.*;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -28,6 +33,13 @@ public class Department {
     @Size(max = 500)
     @Column("description")
     private String description;
+
+    @Size(max = 50)
+    @Column("identifier")
+    private String identifier;
+
+    @Column("college_id")
+    private long collegeId;
 
     @CreatedDate
     @Column("created_at")

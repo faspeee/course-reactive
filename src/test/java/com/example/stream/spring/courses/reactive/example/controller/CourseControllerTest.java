@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
+import com.example.stream.spring.courses.reactive.example.model.StudentDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -104,7 +104,7 @@ public class CourseControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(StudentDTO.class)
+                .expectBodyList(StudentDto.class)
                 .hasSize(5); // Adjust based on expected data
     }
 }

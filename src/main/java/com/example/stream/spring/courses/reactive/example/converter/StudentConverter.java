@@ -1,14 +1,14 @@
 package com.example.stream.spring.courses.reactive.example.converter;
 
 import com.example.stream.spring.courses.reactive.example.entity.Student;
-import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
+import com.example.stream.spring.courses.reactive.example.model.StudentDto;
 import org.springframework.stereotype.Component;
 
 /**
  * Converter class for transforming Student entities to StudentDTOs and vice versa.
  */
 @Component
-public class StudentConverter implements Converter<StudentDTO, Student> {
+public class StudentConverter implements Converter<StudentDto, Student> {
     /**
      * Converts a Student entity to a StudentDTO.
      *
@@ -16,8 +16,8 @@ public class StudentConverter implements Converter<StudentDTO, Student> {
      * @return the corresponding StudentDTO
      */
     @Override
-    public StudentDTO toDto(Student student) {
-        return new StudentDTO(student.getId(), student.getName(), student.getEmail());
+    public StudentDto toDto(Student student) {
+        return new StudentDto(student.getName(), student.getSurname(), student.getEmail());
     }
 
     /**
@@ -27,7 +27,7 @@ public class StudentConverter implements Converter<StudentDTO, Student> {
      * @return the corresponding Student entity
      */
     @Override
-    public Student toEntity(StudentDTO studentDTO) {
+    public Student toEntity(StudentDto studentDTO) {
         Student student = new Student();
         student.setId(studentDTO.id());
         student.setName(studentDTO.name());

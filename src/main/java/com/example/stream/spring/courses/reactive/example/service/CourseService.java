@@ -5,7 +5,7 @@ import com.example.stream.spring.courses.reactive.example.converter.CourseConver
 import com.example.stream.spring.courses.reactive.example.entity.Course;
 import com.example.stream.spring.courses.reactive.example.entity.Student;
 import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
+import com.example.stream.spring.courses.reactive.example.model.StudentDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
 import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;
@@ -17,11 +17,11 @@ import reactor.core.publisher.Mono;
 public class CourseService {
     private final CourseRepository courseRepository;
     private final Converter<CourseDto, Course> converter;
-    private final Converter<StudentDTO, Student> studentConverter;
+    private final Converter<StudentDto, Student> studentConverter;
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
 
-    public CourseService(CourseRepository courseRepository, CourseConverter converter, Converter<StudentDTO, Student> studentConverter, StudentRepository studentRepository, EnrollmentRepository enrollmentRepository) {
+    public CourseService(CourseRepository courseRepository, CourseConverter converter, Converter<StudentDto, Student> studentConverter, StudentRepository studentRepository, EnrollmentRepository enrollmentRepository) {
         this.courseRepository = courseRepository;
         this.converter = converter;
         this.studentConverter = studentConverter;
@@ -35,7 +35,7 @@ public class CourseService {
      * @param courseId the ID of the course
      * @return a Flux stream of Student objects
      */
-    public Flux<StudentDTO> getStudentsByCourseId(Long courseId) {
+    public Flux<StudentDto> getStudentsByCourseId(Long courseId) {
         return enrollmentRepository.findByCourseId(courseId)
                 .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId())
                         .map(studentConverter::toDto));

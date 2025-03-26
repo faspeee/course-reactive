@@ -1,6 +1,6 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.StudentDTO;
+import com.example.stream.spring.courses.reactive.example.model.StudentDto;
 import com.example.stream.spring.courses.reactive.example.service.InstructorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,7 +46,7 @@ public class InstructorController {
             @ApiResponse(responseCode = "404", description = "Teacher not found")
     })
     @GetMapping("/{teacherId}/students")
-    public Flux<StudentDTO> getStudentsByTeacher(@PathVariable Long teacherId) {
+    public Flux<StudentDto> getStudentsByTeacher(@PathVariable Long teacherId) {
         return instructorService.getStudentsByTeacherId(teacherId);
     }
 }
