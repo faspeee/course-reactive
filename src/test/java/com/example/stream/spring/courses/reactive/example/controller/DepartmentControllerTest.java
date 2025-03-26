@@ -70,8 +70,8 @@ public class DepartmentControllerTest {
     @Test
     public void delete_department_test() {
         long departmentId = 1; // Replace with a valid course ID to delete
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/department/deleteDepartment/{id}")
-                        .queryParam("courseId", departmentId)
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/department/deleteDepartment")
+                        .queryParam("departmentId", departmentId)
                         .build())
                 .exchange()
                 .expectStatus().isNoContent();

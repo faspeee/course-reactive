@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -14,8 +17,9 @@ public class CollegeControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CollegeDto createCollegeDto(String updatedCourseName, String codeCourse, String s) {
-        return new CollegeDto();
+    private static CollegeDto createCollegeDto(String name, String dean, Long universityId, LocalDateTime createdAt,
+                                               LocalDateTime updatedAt) {
+        return new CollegeDto(name, dean, universityId, createdAt, updatedAt);
     }
 
     @Test
@@ -47,7 +51,7 @@ public class CollegeControllerTest {
 
     @Test
     public void add_college_test() {
-        CollegeDto newCollege = createCollegeDto("John Doe", "code course", "282018392KS");
+        CollegeDto newCollege = createCollegeDto("John Doe", "that is it", 1L, LocalDateTime.now(), null);
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -59,15 +63,15 @@ public class CollegeControllerTest {
                 .consumeWith(response -> {
                     CollegeDto createdCollege = response.getResponseBody();
                     assertNotNull(createdCollege);
-                    assertNotNull(createdCollege.identifier());
-                    assertEquals("New Course", createdCollege.name());
+                    assertNotNull(createdCollege.universityId());
+                    assertEquals("John Doe", createdCollege.name());
                 });
     }
 
     @Test
     public void delete_college_test() {
         long collegeId = 1; // Replace with a valid course ID to delete
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/college/deleteCollege/{id}")
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/college/deleteCollege")
                         .queryParam("collegeId", collegeId)
                         .build())
                 .exchange()
@@ -76,7 +80,7 @@ public class CollegeControllerTest {
 
     @Test
     public void update_college_test() {
-        CollegeDto existingCollege = createCollegeDto("Updated Course Name", "code course", "282018392KS");
+        CollegeDto existingCollege = createCollegeDto("John week", "that is it", 1L, null, LocalDateTime.now());
 
         // Set other properties as needed
 
@@ -89,7 +93,7 @@ public class CollegeControllerTest {
                 .consumeWith(response -> {
                     CollegeDto updateCollege = response.getResponseBody();
                     assertNotNull(updateCollege);
-                    assertEquals("Updated Department Name", updateCollege.name());
+                    assertEquals("John week", updateCollege.name());
                 });
     }
 }

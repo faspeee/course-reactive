@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -14,8 +17,9 @@ public class ClassroomControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static ClassroomDto createClassroomDto(String updatedCourseName, String codeCourse, String s) {
-        return new ClassroomDto();
+    private static ClassroomDto createClassroomDto(Long buildingId, String roomNumber, Integer capacity, LocalDateTime createdAt,
+                                                   LocalDateTime updatedAt) {
+        return new ClassroomDto(buildingId, roomNumber, capacity, createdAt, updatedAt);
     }
 
     @Test
@@ -47,7 +51,7 @@ public class ClassroomControllerTest {
 
     @Test
     public void add_classroom_test() {
-        ClassroomDto newClassroom = createClassroomDto("John Doe", "code course", "282018392KS");
+        ClassroomDto newClassroom = createClassroomDto(1L, "XVI", 10, LocalDateTime.now(), null);
         // Set other properties as needed
 
         webTestClient.post().uri("/classroom/addDepartment")
@@ -59,15 +63,15 @@ public class ClassroomControllerTest {
                 .consumeWith(response -> {
                     ClassroomDto createdClassroom = response.getResponseBody();
                     assertNotNull(createdClassroom);
-                    assertNotNull(createdClassroom.identifier());
-                    assertEquals("New Course", createdClassroom.name());
+                    assertNotNull(createdClassroom.capacity());
+                    assertEquals(10, createdClassroom.capacity());
                 });
     }
 
     @Test
     public void delete_classroom_test() {
         long classroomId = 1; // Replace with a valid course ID to delete
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/classroom/deleteDepartment/{id}")
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/classroom/deleteDepartment")
                         .queryParam("classroomId", classroomId)
                         .build())
                 .exchange()
@@ -76,7 +80,7 @@ public class ClassroomControllerTest {
 
     @Test
     public void update_classroom_test() {
-        ClassroomDto existingClassroom = createClassroomDto("Updated Course Name", "code course", "282018392KS");
+        ClassroomDto existingClassroom = createClassroomDto(1L, "XVIII", 10, LocalDateTime.now(), null);
 
         // Set other properties as needed
 
@@ -89,7 +93,7 @@ public class ClassroomControllerTest {
                 .consumeWith(response -> {
                     ClassroomDto updateCollege = response.getResponseBody();
                     assertNotNull(updateCollege);
-                    assertEquals("Updated Department Name", updateCollege.name());
+                    assertEquals("XVIII", updateCollege.roomNumber());
                 });
     }
 

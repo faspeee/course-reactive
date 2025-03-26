@@ -84,6 +84,7 @@ CREATE TABLE university
     name          VARCHAR(100) NOT NULL,
     country       VARCHAR(50)  NOT NULL,
     city          VARCHAR(50)  NOT NULL,
+    location      VARCHAR(50)  NOT NULL,
     established   DATE,
     accreditation VARCHAR(100),   -- Accreditation body or status
     president     VARCHAR(100),   -- Current president or chancellor
@@ -156,24 +157,27 @@ CREATE TABLE classroom
     version     BIGINT,
     FOREIGN KEY (building_id) REFERENCES building (id)
 );
-INSERT INTO university (name, location, established, accreditation, president, student_count, website, contact_email,
-                        phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs, international,
-                        ranking, version)
-VALUES ('Global Tech University', '123 University Ave, Tech City', '1965-09-01', 'ABET', 'Dr. Jane Smith', 15000,
-        'https://www.globaltech.edu', 'info@globaltech.edu', '+1-800-555-1234', 'Innovating the Future',
-        'Blue and Silver', 'Techie the Tiger', 500.00, 10, 100, TRUE, 25, 1);
+INSERT INTO university (name, country, city, location, established, accreditation, president, student_count, website,
+                        contact_email, phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs,
+                        international, ranking, created_at, updated_at, version)
+VALUES ('Springfield University', 'USA', 'Springfield', '742 Evergreen Terrace', '1950-09-15',
+        'Higher Learning Commission', 'Dr. Jane Smith', 15000, 'https://www.springfielduniversity.edu',
+        'info@springfielduniversity.edu', '+1-555-123-4567', 'Knowledge and Wisdom',
+        'Blue and Gold', 'The Fighting Squirrel', 150.75, 10, 85, TRUE, 120, CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP, 1);
 
-INSERT INTO campus (name, address, university_id, version)
-VALUES ('Main Campus', '123 University Ave, Tech City', 1, 1),
-       ('Downtown Campus', '456 City Center Blvd, Tech City', 1, 1);
+
+INSERT INTO campus (name, address, country, city, university_id, version)
+VALUES ('Main Campus', '123 University Ave, Tech City', 'Usa', 'George', 1, 1),
+       ('Downtown Campus', '456 City Center Blvd, Tech City', 'Italia', 'Bologna', 1, 1);
 INSERT INTO college (name, dean, university_id, version)
 VALUES ('College of Engineering', 'Dr. Alan Turing', 1, 1),
        ('College of Arts and Sciences', 'Dr. Marie Curie', 1, 1);
-INSERT INTO department (name, description, college_id, version)
-VALUES ('Computer Science', 'Focuses on the study of computer systems and computational processes.', 1, 1),
+INSERT INTO department (name, description, identifier, college_id, version)
+VALUES ('Computer Science', 'Focuses on the study of computer systems and computational processes.', 'DSUEOW823', 1, 1),
        ('Electrical Engineering',
-        'Deals with the study and application of electricity, electronics, and electromagnetism.', 1, 1),
-       ('Biology', 'Explores the science of life and living organisms.', 2, 1);
+        'Deals with the study and application of electricity, electronics, and electromagnetism.', 'SWPSAS83', 1, 1),
+       ('Biology', 'Explores the science of life and living organisms.', 'SWPSAS81', 2, 1);
 INSERT INTO building (name, code, campus_id, version)
 VALUES ('Engineering Hall', 'ENGH', 1, 1),
        ('Science Building', 'SCIB', 1, 1),
