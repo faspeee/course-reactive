@@ -3,9 +3,11 @@ package com.example.stream.spring.courses.reactive.example.entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table("campus")
@@ -27,7 +29,10 @@ public class Campus {
 
     @Column("updated_at")
     private LocalDateTime updatedAt;
-
+    @Transient
+    private LocalDate startDate;
+    @Transient
+    private LocalDate endDate;
     private String country;
     private String city;
     private Long version;
