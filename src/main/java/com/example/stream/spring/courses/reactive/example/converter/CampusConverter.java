@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class CampusConverter implements Converter<CampusRequestDto, CampusResponseDto, Campus> {
     @Override
     public CampusResponseDto toDto(Campus entity) {
-        return new CampusResponseDto(entity.getName(), entity.getUniversityId(), entity.getCountry(), entity.getCity(),
+        return new CampusResponseDto(entity.getName(), entity.getAddress(), entity.getUniversityId(), entity.getCountry(), entity.getCity(),
                 entity.getStartDate(), entity.getEndDate(), entity.getCreatedAt(), entity.getUpdatedAt(), entity.getName());
     }
 
