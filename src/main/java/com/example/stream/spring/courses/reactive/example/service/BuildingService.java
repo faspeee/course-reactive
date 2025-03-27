@@ -1,6 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.BuildingConverter;
+import com.example.stream.spring.courses.reactive.example.model.request.BuildingRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.BuildingResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.BuildingRepository;
 import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
@@ -31,5 +32,7 @@ public class BuildingService {
         return buildingRepository.findById(buildingId).map(buildingConverter::toDto);
     }
 
-
+    public Mono<BuildingResponseDto> createBuilding(BuildingRequestDto buildingRequestDto) {
+        return buildingRepository.save(buildingConverter.toEntity(buildingRequestDto)).map(buildingConverter::toDto);
+    }
 }
