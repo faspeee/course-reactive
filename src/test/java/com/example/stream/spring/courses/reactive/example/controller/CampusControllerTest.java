@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -17,8 +19,10 @@ class CampusControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CampusRequestDto createCampusDto(String name, String address, Long universityId, String identifier, String country, String city) {
-        return new CampusRequestDto(name, address, universityId, country, city, identifier);
+    private static CampusRequestDto createCampusDto(String name, String address, Long universityId,
+                                                    LocalDateTime startDate, LocalDateTime endDate,
+                                                    String identifier, String country, String city) {
+        return new CampusRequestDto(name, address, universityId, country, city, startDate, endDate, identifier);
     }
 
     @Test
@@ -50,7 +54,9 @@ class CampusControllerTest {
 
     @Test
     void add_campus_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L, "identifier", "Italy", "Napoli");
+        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L,
+                LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
+                "identifier", "Italy", "Napoli");
         // Set other properties as needed
 
         webTestClient.post().uri("/campus/addCampus")
@@ -70,7 +76,9 @@ class CampusControllerTest {
     @DisplayName("add campus on country that not exist return error")
     @Test
     void add_campus_error_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L, "identifier 2", "Lavazza", "Napoli");
+        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L,
+                LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
+                "identifier 2", "Lavazza", "Napoli");
         // Set other properties as needed
 
         webTestClient.post().uri("/campus/addCampus")
@@ -83,7 +91,9 @@ class CampusControllerTest {
     @DisplayName("add campus on city that not exist on the country return error")
     @Test
     void add_campus_error_2_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L, "identifier 2", "Spain", "Napoli");
+        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L,
+                LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
+                "identifier 2", "Spain", "Napoli");
         // Set other properties as needed
 
         webTestClient.post().uri("/campus/addCampus")
@@ -105,7 +115,9 @@ class CampusControllerTest {
 
     @Test
     void update_campus_test() {
-        CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", 1L, "identifier 2", "Italy", "Napoli");
+        CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", 1L,
+                LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
+                "identifier 2", "Italy", "Napoli");
 
         // Set other properties as needed
 
