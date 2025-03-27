@@ -1,6 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.CollegeDto;
+import com.example.stream.spring.courses.reactive.example.model.request.CollegeRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.CollegeResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,19 +9,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CollegeControllerTest {
+class CollegeControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CollegeDto createCollegeDto(String name, String dean, Long universityId, LocalDateTime createdAt,
-                                               LocalDateTime updatedAt) {
-        return new CollegeDto(name, dean, universityId, createdAt, updatedAt);
+    private static CollegeRequestDto createCollegeDto(String name, String dean, Long universityId, String identifier) {
+        return new CollegeRequestDto(name, dean, universityId, identifier);
     }
 
     @Test
@@ -29,13 +27,13 @@ public class CollegeControllerTest {
     }
 
     @Test
-    public void find_all_college() {
+    void find_all_college() {
         webTestClient.get().uri("/college/getAllCollege")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void get_college_test() {
+    void get_college_test() {
         long collegeId = 1; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/college/getCollege")
                         .queryParam("collegeId", collegeId)
@@ -43,16 +41,16 @@ public class CollegeControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(CollegeDto.class)
+                .expectBody(CollegeResponseDto.class)
                 .consumeWith(response -> {
-                    CollegeDto college = response.getResponseBody();
+                    CollegeResponseDto college = response.getResponseBody();
                     assertNotNull(college);
                 });
     }
 
     @Test
-    public void add_college_test() {
-        CollegeDto newCollege = createCollegeDto("John Doe", "that is it", 1L, LocalDateTime.now(), null);
+    void add_college_test() {
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", 1L, "id 3");
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -60,9 +58,9 @@ public class CollegeControllerTest {
                 .bodyValue(newCollege)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(CollegeDto.class)
+                .expectBody(CollegeResponseDto.class)
                 .consumeWith(response -> {
-                    CollegeDto createdCollege = response.getResponseBody();
+                    CollegeResponseDto createdCollege = response.getResponseBody();
                     assertNotNull(createdCollege);
                     assertNotNull(createdCollege.universityId());
                     assertEquals("John Doe", createdCollege.name());
@@ -71,8 +69,8 @@ public class CollegeControllerTest {
 
     @DisplayName("add college in university that not exist, return error")
     @Test
-    public void add_college_error_test() {
-        CollegeDto newCollege = createCollegeDto("John Doe", "that is it", 2231L, LocalDateTime.now(), null);
+    void add_college_error_test() {
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", 2231L, "id 2");
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -83,7 +81,7 @@ public class CollegeControllerTest {
     }
 
     @Test
-    public void delete_college_test() {
+    void delete_college_test() {
         long collegeId = 1; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/college/deleteCollege")
                         .queryParam("collegeId", collegeId)
@@ -93,8 +91,8 @@ public class CollegeControllerTest {
     }
 
     @Test
-    public void update_college_test() {
-        CollegeDto existingCollege = createCollegeDto("John week", "that is it", 1L, null, LocalDateTime.now());
+    void update_college_test() {
+        CollegeRequestDto existingCollege = createCollegeDto("John week", "that is it", 1L, "id");
 
         // Set other properties as needed
 
@@ -103,9 +101,9 @@ public class CollegeControllerTest {
                 .bodyValue(existingCollege)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CollegeDto.class)
+                .expectBody(CollegeResponseDto.class)
                 .consumeWith(response -> {
-                    CollegeDto updateCollege = response.getResponseBody();
+                    CollegeResponseDto updateCollege = response.getResponseBody();
                     assertNotNull(updateCollege);
                     assertEquals("John week", updateCollege.name());
                 });

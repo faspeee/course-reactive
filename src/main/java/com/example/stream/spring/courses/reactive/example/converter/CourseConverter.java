@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.converter;
 
 import com.example.stream.spring.courses.reactive.example.entity.Course;
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
+import com.example.stream.spring.courses.reactive.example.model.request.CourseDto;
 import org.springframework.stereotype.Component;
 
 @Component

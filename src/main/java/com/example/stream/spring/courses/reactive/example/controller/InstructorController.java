@@ -1,6 +1,6 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.request.StudentDto;
 import com.example.stream.spring.courses.reactive.example.service.InstructorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

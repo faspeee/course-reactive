@@ -1,40 +1,39 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
+import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CourseControllerTest {
+class CourseControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CourseDto createCourseDto(String courseName, String courseCode, LocalDate startDate, LocalDate endDate, int creditHours, long departmentId) {
-        return new CourseDto(courseName, courseCode, startDate, endDate, creditHours, departmentId);
+    private static CourseRequestDto createCourseDto(String courseName, String courseCode, String identifier, int creditHours, long departmentId) {
+        return new CourseRequestDto(courseName, courseCode, creditHours, departmentId, identifier);
     }
 
     @Test
-    public void dummyTest() {
+    void dummyTest() {
         assertNotNull(webTestClient);
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         webTestClient.get().uri("/courses/getAllCourse")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void testGetCourse() {
+    void testGetCourse() {
         long courseId = 1; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/courses/getCourse")
                         .queryParam("courseId", courseId)
@@ -42,16 +41,16 @@ public class CourseControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(CourseDto.class)
+                .expectBody(CourseResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto course = response.getResponseBody();
+                    CourseResponseDto course = response.getResponseBody();
                     assertNotNull(course);
                 });
     }
 
     @Test
-    public void testAddCourse() {
-        CourseDto newCourse = createCourseDto("New Course", "code course", LocalDate.now(), LocalDate.now(), 1, 1);
+    void testAddCourse() {
+        CourseRequestDto newCourse = createCourseDto("New Course", "code course", "id 2", 1, 1);
         // Set other properties as needed
 
         webTestClient.post().uri("/courses/addCourse")
@@ -59,9 +58,9 @@ public class CourseControllerTest {
                 .bodyValue(newCourse)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(CourseDto.class)
+                .expectBody(CourseResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto createdCourse = response.getResponseBody();
+                    CourseResponseDto createdCourse = response.getResponseBody();
                     assertNotNull(createdCourse);
                     assertNotNull(createdCourse.courseCode());
                     assertEquals("New Course", createdCourse.courseName());
@@ -69,7 +68,7 @@ public class CourseControllerTest {
     }
 
     @Test
-    public void testDeleteCourse() {
+    void testDeleteCourse() {
         long courseId = 1; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/courses/deleteCourse")
                         .queryParam("courseId", courseId)
@@ -79,8 +78,8 @@ public class CourseControllerTest {
     }
 
     @Test
-    public void testUpdateCourse() {
-        CourseDto existingCourse = createCourseDto("Updated Course Name", "code course", LocalDate.now(), LocalDate.now(), 2, 2);
+    void testUpdateCourse() {
+        CourseRequestDto existingCourse = createCourseDto("Updated Course Name", "code course", "id", 2, 2);
 
         // Set other properties as needed
 
@@ -89,22 +88,22 @@ public class CourseControllerTest {
                 .bodyValue(existingCourse)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(CourseDto.class)
+                .expectBody(CourseResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto updatedCourse = response.getResponseBody();
+                    CourseResponseDto updatedCourse = response.getResponseBody();
                     assertNotNull(updatedCourse);
                     assertEquals("Updated Course Name", updatedCourse.courseName());
                 });
     }
 
     @Test
-    public void testGetStudentsByCourse() {
+    void testGetStudentsByCourse() {
         long courseId = 1; // Replace with a valid course ID
         webTestClient.get().uri("/courses/{courseId}/students", courseId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(StudentDto.class)
+                .expectBodyList(StudentResponseDto.class)
                 .hasSize(5); // Adjust based on expected data
     }
 }

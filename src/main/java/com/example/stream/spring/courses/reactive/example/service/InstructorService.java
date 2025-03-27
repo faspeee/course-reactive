@@ -3,7 +3,7 @@ package com.example.stream.spring.courses.reactive.example.service;
 import com.example.stream.spring.courses.reactive.example.converter.Converter;
 import com.example.stream.spring.courses.reactive.example.converter.StudentConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Student;
-import com.example.stream.spring.courses.reactive.example.model.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.request.StudentDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
 import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;

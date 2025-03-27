@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.BuildingDto;
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
+import com.example.stream.spring.courses.reactive.example.model.request.BuildingRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.BuildingResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BuildingControllerTest {
+class BuildingControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
@@ -25,13 +23,13 @@ public class BuildingControllerTest {
     }
 
     @Test
-    public void find_all_building() {
+    void find_all_building() {
         webTestClient.get().uri("/building/getAllBuilding")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void get_building_test() {
+    void get_building_test() {
         long buildingId = 1; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/building/getBuildingById")
                         .queryParam("buildingId", buildingId)
@@ -39,16 +37,16 @@ public class BuildingControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(CourseDto.class)
+                .expectBody(BuildingResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto course = response.getResponseBody();
+                    BuildingResponseDto course = response.getResponseBody();
                     assertNotNull(course);
                 });
     }
 
     @Test
-    public void add_building_test() {
-        BuildingDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 2L, LocalDateTime.now(), null);
+    void add_building_test() {
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 2L, "identifier");
         // Set other properties as needed
 
         webTestClient.post().uri("/building/addBuilding")
@@ -56,9 +54,9 @@ public class BuildingControllerTest {
                 .bodyValue(newBuilding)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(BuildingDto.class)
+                .expectBody(BuildingResponseDto.class)
                 .consumeWith(response -> {
-                    BuildingDto createBuilding = response.getResponseBody();
+                    BuildingResponseDto createBuilding = response.getResponseBody();
                     assertNotNull(createBuilding);
                     assertNotNull(createBuilding.createdAt());
                     assertEquals("Carlos Filling X", createBuilding.name());
@@ -67,8 +65,8 @@ public class BuildingControllerTest {
 
     @DisplayName("adding building in campus that not exist return error")
     @Test
-    public void add_building_error_test() {
-        BuildingDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 220L, LocalDateTime.now(), null);
+    void add_building_error_test() {
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 220L, "identifier");
         // Set other properties as needed
         webTestClient.post().uri("/building/addBuilding")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +76,7 @@ public class BuildingControllerTest {
     }
 
     @Test
-    public void delete_building_test() {
+    void delete_building_test() {
         long buildingId = 1; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/building/deleteBuilding")
                         .queryParam("buildingId", buildingId)
@@ -88,8 +86,8 @@ public class BuildingControllerTest {
     }
 
     @Test
-    public void update_building_test() {
-        BuildingDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", 1L, null, LocalDateTime.now());
+    void update_building_test() {
+        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", 1L, "identifier");
 
         // Set other properties as needed
 
@@ -98,16 +96,16 @@ public class BuildingControllerTest {
                 .bodyValue(existedBuilding)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(BuildingDto.class)
+                .expectBody(BuildingResponseDto.class)
                 .consumeWith(response -> {
-                    BuildingDto updateBuilding = response.getResponseBody();
+                    BuildingResponseDto updateBuilding = response.getResponseBody();
                     assertNotNull(updateBuilding);
                     assertEquals("Carlos Filling", updateBuilding.name());
                 });
     }
 
-    private BuildingDto createBuildingDto(String name, String code, Long campusId, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        return new BuildingDto(name, code, campusId, createdAt, updatedAt);
+    private BuildingRequestDto createBuildingDto(String name, String code, Long campusId, String identifier) {
+        return new BuildingRequestDto(name, code, campusId, identifier);
     }
 
 }

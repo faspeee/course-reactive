@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.UniversityDto;
+import com.example.stream.spring.courses.reactive.example.model.request.UniversityRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.UniversityResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,24 +10,22 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class UniversityControllerTest {
+class UniversityControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static UniversityDto createUniversityDto(String name, String location, LocalDate established, String accreditation, String president,
-                                                     Integer studentCount, String website, String contactEmail, String phoneNumber, String motto,
-                                                     String colors, String mascot, Double campusArea, Integer numFaculties, Integer numPrograms,
-                                                     Boolean international, Integer ranking, LocalDateTime createdAt, LocalDateTime updatedAt,
-                                                     String country, String city) {
-        return new UniversityDto(name, location, established, accreditation, president, studentCount, website, contactEmail,
-                phoneNumber, motto, colors, mascot, campusArea, numFaculties, numPrograms, international, ranking,
-                createdAt, updatedAt, country, city);
+    private static UniversityRequestDto createUniversityDto(String name, String location, LocalDate established, String accreditation, String president,
+                                                            Integer studentCount, String website, String contactEmail, String phoneNumber, String motto,
+                                                            String colors, String mascot, Double campusArea, Integer numFaculties, Integer numPrograms,
+                                                            Boolean international, Integer ranking, String identifier,
+                                                            String country, String city) {
+        return new UniversityRequestDto(name, location, established, accreditation, president, studentCount, website, contactEmail,
+                phoneNumber, motto, colors, mascot, campusArea, numFaculties, numPrograms, international, ranking, country, city, identifier);
     }
 
     @Test
@@ -36,13 +34,13 @@ public class UniversityControllerTest {
     }
 
     @Test
-    public void find_all_universities() {
+    void find_all_universities() {
         webTestClient.get().uri("/university/getAllUniversities")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void get_university_test() {
+    void get_university_test() {
         long departmentId = 1; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/university/getUniversity")
                         .queryParam("deparmentId", departmentId)
@@ -50,21 +48,20 @@ public class UniversityControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(CourseDto.class)
+                .expectBody(UniversityResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto course = response.getResponseBody();
+                    UniversityResponseDto course = response.getResponseBody();
                     assertNotNull(course);
                 });
     }
 
     @Test
-    public void add_university_test() {
-        UniversityDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+    void add_university_test() {
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
-                150.75, 10, 85, true, 120, LocalDateTime.now(),
-                LocalDateTime.now(), "USA", "Springfield");
+                150.75, 10, 85, true, 120, "id", "USA", "Springfield");
         // Set other properties as needed
 
         webTestClient.post().uri("/university/addUniversity")
@@ -72,9 +69,9 @@ public class UniversityControllerTest {
                 .bodyValue(newUniversity)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(UniversityDto.class)
+                .expectBody(UniversityResponseDto.class)
                 .consumeWith(response -> {
-                    UniversityDto createdUniversity = response.getResponseBody();
+                    UniversityResponseDto createdUniversity = response.getResponseBody();
                     assertNotNull(createdUniversity);
                     assertNotNull(createdUniversity.accreditation());
                     assertEquals("Springfield University", createdUniversity.name());
@@ -83,13 +80,12 @@ public class UniversityControllerTest {
 
     @DisplayName("add a university on city that not exist return error message")
     @Test
-    public void add_university_error_test() {
-        UniversityDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+    void add_university_error_test() {
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission 2", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
-                150.75, 10, 85, true, 120, LocalDateTime.now(),
-                LocalDateTime.now(), "ILLY", "AE");
+                150.75, 10, 85, true, 120, "id 2", "ILLY", "AE");
         // Set other properties as needed
 
         webTestClient.post().uri("/university/addUniversity")
@@ -101,13 +97,12 @@ public class UniversityControllerTest {
 
     @DisplayName("add a university on country that not exist return error message")
     @Test
-    public void add_university_error_2_test() {
-        UniversityDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+    void add_university_error_2_test() {
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission 2", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
-                150.75, 10, 85, true, 120, LocalDateTime.now(),
-                LocalDateTime.now(), "USA", "AE");
+                150.75, 10, 85, true, 120, "id 3", "USA", "AE");
         // Set other properties as needed
 
         webTestClient.post().uri("/university/addUniversity")
@@ -118,7 +113,7 @@ public class UniversityControllerTest {
     }
 
     @Test
-    public void delete_university_test() {
+    void delete_university_test() {
         long universityId = 1; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/university/deleteUniversity")
                         .queryParam("universityId", universityId)
@@ -128,13 +123,12 @@ public class UniversityControllerTest {
     }
 
     @Test
-    public void update_university_test() {
-        UniversityDto existingUniversity = createUniversityDto("Guantanamo University", "742 Evergreen Terrace, Springfield",
+    void update_university_test() {
+        UniversityRequestDto existingUniversity = createUniversityDto("Guantanamo University", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
-                150.75, 10, 85, true, 120, LocalDateTime.now(),
-                LocalDateTime.now(), "USA", "Springfield");
+                150.75, 10, 85, true, 120, "id 4", "USA", "Springfield");
 
         // Set other properties as needed
 
@@ -143,9 +137,9 @@ public class UniversityControllerTest {
                 .bodyValue(existingUniversity)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(UniversityDto.class)
+                .expectBody(UniversityResponseDto.class)
                 .consumeWith(response -> {
-                    UniversityDto updateUniversity = response.getResponseBody();
+                    UniversityResponseDto updateUniversity = response.getResponseBody();
                     assertNotNull(updateUniversity);
                     assertEquals("Guantanamo University", updateUniversity.name());
                 });

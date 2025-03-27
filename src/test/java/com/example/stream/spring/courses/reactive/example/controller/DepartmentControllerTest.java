@@ -1,8 +1,8 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.DepartmentDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.request.DepartmentRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.DepartmentResponseDto;
+import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,27 +13,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DepartmentControllerTest {
+class DepartmentControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static DepartmentDto createDepartmentDto(String name, String description, String identifier) {
-        return new DepartmentDto(name, description, identifier);
+    private static DepartmentRequestDto createDepartmentDto(String name, String description, String identifier) {
+        return new DepartmentRequestDto(name, description, identifier);
     }
 
     @Test
-    public void dummyTest() {
+    void dummyTest() {
         assertNotNull(webTestClient);
     }
 
     @Test
-    public void find_all_departments() {
+    void find_all_departments() {
         webTestClient.get().uri("/department/getAllDepartment")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void get_department_test() {
+    void get_department_test() {
         long departmentId = 1; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/department/getDepartment")
                         .queryParam("deparmentId", departmentId)
@@ -41,16 +41,16 @@ public class DepartmentControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(CourseDto.class)
+                .expectBody(DepartmentResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto course = response.getResponseBody();
+                    DepartmentResponseDto course = response.getResponseBody();
                     assertNotNull(course);
                 });
     }
 
     @Test
-    public void add_department_test() {
-        DepartmentDto newDepartment = createDepartmentDto("John Doe", "code course", "282018392KS");
+    void add_department_test() {
+        DepartmentRequestDto newDepartment = createDepartmentDto("John Doe", "code course", "282018392KS");
         // Set other properties as needed
 
         webTestClient.post().uri("/department/addDepartment")
@@ -58,9 +58,9 @@ public class DepartmentControllerTest {
                 .bodyValue(newDepartment)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(DepartmentDto.class)
+                .expectBody(DepartmentResponseDto.class)
                 .consumeWith(response -> {
-                    DepartmentDto createdDepartment = response.getResponseBody();
+                    DepartmentResponseDto createdDepartment = response.getResponseBody();
                     assertNotNull(createdDepartment);
                     assertNotNull(createdDepartment.identifier());
                     assertEquals("New Course", createdDepartment.name());
@@ -68,7 +68,7 @@ public class DepartmentControllerTest {
     }
 
     @Test
-    public void delete_department_test() {
+    void delete_department_test() {
         long departmentId = 1; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/department/deleteDepartment")
                         .queryParam("departmentId", departmentId)
@@ -78,8 +78,8 @@ public class DepartmentControllerTest {
     }
 
     @Test
-    public void update_department_test() {
-        DepartmentDto existingDepartment = createDepartmentDto("Updated Course Name", "code course", "282018392KS");
+    void update_department_test() {
+        DepartmentRequestDto existingDepartment = createDepartmentDto("Updated Course Name", "code course", "282018392KS");
 
         // Set other properties as needed
 
@@ -88,22 +88,22 @@ public class DepartmentControllerTest {
                 .bodyValue(existingDepartment)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(DepartmentDto.class)
+                .expectBody(DepartmentResponseDto.class)
                 .consumeWith(response -> {
-                    DepartmentDto updateDepartment = response.getResponseBody();
+                    DepartmentResponseDto updateDepartment = response.getResponseBody();
                     assertNotNull(updateDepartment);
                     assertEquals("Updated Department Name", updateDepartment.name());
                 });
     }
 
     @Test
-    public void get_course_by_department_test() {
+    void get_course_by_department_test() {
         long departmentId = 1; // Replace with a valid course ID
         webTestClient.get().uri("/department/{departmentId}/course", departmentId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(StudentDto.class)
+                .expectBodyList(StudentResponseDto.class)
                 .hasSize(5); // Adjust based on expected data
     }
 

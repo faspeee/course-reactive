@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
-
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDto;
+ 
+import com.example.stream.spring.courses.reactive.example.model.request.StudentRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,27 +12,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StudentControllerTest {
+class StudentControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static StudentDto createStudentDto(String firstName, String lastName, String email) {
-        return new StudentDto(firstName, lastName, email);
+    private static StudentRequestDto createStudentDto(String firstName, String lastName, String email) {
+        return new StudentRequestDto(firstName, lastName, email);
     }
 
     @Test
-    public void dummyTest() {
+    void dummyTest() {
         assertNotNull(webTestClient);
     }
 
     @Test
-    public void find_all_student_test() {
+    void find_all_student_test() {
         webTestClient.get().uri("/student/getAllStudents")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
-    public void get_student_test() {
+    void get_student_test() {
         long studentId = 1; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/student/getStudent")
                         .queryParam("studentId", studentId)
@@ -40,16 +40,16 @@ public class StudentControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(CourseDto.class)
+                .expectBody(StudentResponseDto.class)
                 .consumeWith(response -> {
-                    CourseDto course = response.getResponseBody();
+                    StudentResponseDto course = response.getResponseBody();
                     assertNotNull(course);
                 });
     }
 
     @Test
-    public void add_student_test() {
-        StudentDto newStudent = createStudentDto("Fabian", "Aspee Encina", "faspeeencina@gmail.com");
+    void add_student_test() {
+        StudentRequestDto newStudent = createStudentDto("Fabian", "Aspee Encina", "faspeeencina@gmail.com");
         // Set other properties as needed
 
         webTestClient.post().uri("/student/addStudent")
@@ -57,9 +57,9 @@ public class StudentControllerTest {
                 .bodyValue(newStudent)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(StudentDto.class)
+                .expectBody(StudentResponseDto.class)
                 .consumeWith(response -> {
-                    StudentDto studentDTO = response.getResponseBody();
+                    StudentResponseDto studentDTO = response.getResponseBody();
                     assertNotNull(studentDTO);
                     assertNotNull(studentDTO.name());
                     assertEquals("New Student", studentDTO.email());
@@ -67,7 +67,7 @@ public class StudentControllerTest {
     }
 
     @Test
-    public void delete_student_test() {
+    void delete_student_test() {
         long studentId = 1; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/student/deleteStudent")
                         .queryParam("studentId", studentId)
@@ -77,8 +77,8 @@ public class StudentControllerTest {
     }
 
     @Test
-    public void update_student_test() {
-        StudentDto existingStudent = createStudentDto("John", "Dore", "john.doe@student.edu");
+    void update_student_test() {
+        StudentRequestDto existingStudent = createStudentDto("John", "Dore", "john.doe@student.edu");
 
         // Set other properties as needed
 
@@ -87,9 +87,9 @@ public class StudentControllerTest {
                 .bodyValue(existingStudent)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(StudentDto.class)
+                .expectBody(StudentResponseDto.class)
                 .consumeWith(response -> {
-                    StudentDto updateStudent = response.getResponseBody();
+                    StudentResponseDto updateStudent = response.getResponseBody();
                     assertNotNull(updateStudent);
                     assertEquals("Updated Student Name", updateStudent.name());
                 });

@@ -1,7 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.request.CourseDto;
+import com.example.stream.spring.courses.reactive.example.model.request.StudentDto;
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
