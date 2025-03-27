@@ -1,7 +1,8 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
-import com.example.stream.spring.courses.reactive.example.model.request.CourseDto;
-import com.example.stream.spring.courses.reactive.example.model.request.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
+import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +20,17 @@ public class CourseController {
     }
 
     @GetMapping("/getAllCourse")
-    public Flux<CourseDto> getAllCourses() {
+    public Flux<CourseResponseDto> getAllCourses() {
         return courseService.getAllCourses();
     }
 
     @GetMapping("/getCourse")
-    public Mono<CourseDto> getCourse(@RequestParam long courseId) {
+    public Mono<CourseResponseDto> getCourse(@RequestParam long courseId) {
         return courseService.getCourse(courseId);
     }
 
     @PostMapping("/addCourse")
-    public ResponseEntity<Mono<CourseDto>> addCourse(@RequestBody CourseDto courseDto) {
+    public ResponseEntity<Mono<CourseResponseDto>> addCourse(@RequestBody CourseRequestDto courseDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(courseService.addCourse(courseDto));
@@ -41,12 +42,12 @@ public class CourseController {
     }
 
     @PutMapping("/updateCourse")
-    public Mono<CourseDto> updateCourse(@RequestBody CourseDto courseDto) {
+    public Mono<CourseResponseDto> updateCourse(@RequestBody CourseRequestDto courseDto) {
         return courseService.updateCourse(courseDto);
     }
 
     @GetMapping("/{courseId}/students")
-    public Flux<StudentDto> getStudentsByCourse(@PathVariable Long courseId) {
+    public Flux<StudentResponseDto> getStudentsByCourse(@PathVariable Long courseId) {
         return courseService.getStudentsByCourseId(courseId);
     }
 }

@@ -1,24 +1,28 @@
 package com.example.stream.spring.courses.reactive.example.converter;
 
 import com.example.stream.spring.courses.reactive.example.entity.Course;
-import com.example.stream.spring.courses.reactive.example.model.request.CourseDto;
+import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
+import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CourseConverter implements Converter<CourseDto, Course> {
+public class CourseConverter implements Converter<CourseRequestDto, CourseResponseDto, Course> {
     @Override
-    public CourseDto toDto(Course entity) {
-        return new CourseDto(entity.getCourseName(), entity.getCourseCode(), entity.getStartDate(), entity.getEndDate(), entity.getCreditHours(), entity.getDepartmentId());
+    public CourseResponseDto toDto(Course entity) {
+        return new CourseResponseDto(entity.getCourseName(), entity.getCourseCode(),
+                entity.getStartDate(), entity.getEndDate(), entity.getCreditHours(),
+                entity.getDepartmentId(), entity.getIdentifier());
     }
 
     @Override
-    public Course toEntity(CourseDto dto) {
+    public Course toEntity(CourseRequestDto dto) {
         Course course = new Course();
         course.setCourseCode(dto.courseCode());
         course.setCourseName(dto.courseName());
         course.setCreditHours(dto.creditHours());
-        course.setStartDate(dto.startDate());
-        course.setEndDate(dto.endDate());
+        // fixme
+        //course.setStartDate(dto.);
+        //course.setEndDate(dto.endDate());
         course.setDepartmentId(dto.departmentId());
         return course;
     }

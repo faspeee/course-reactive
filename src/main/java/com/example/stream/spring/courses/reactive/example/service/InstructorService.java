@@ -1,9 +1,7 @@
 package com.example.stream.spring.courses.reactive.example.service;
 
-import com.example.stream.spring.courses.reactive.example.converter.Converter;
 import com.example.stream.spring.courses.reactive.example.converter.StudentConverter;
-import com.example.stream.spring.courses.reactive.example.entity.Student;
-import com.example.stream.spring.courses.reactive.example.model.request.StudentDto;
+import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
 import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;
@@ -19,7 +17,7 @@ public class InstructorService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
-    private final Converter<StudentDto, Student> studentConverter;
+    private final StudentConverter studentConverter;
 
     /**
      * Constructs a TeacherService with the specified repositories and converter.
@@ -45,7 +43,7 @@ public class InstructorService {
      * @param teacherId the ID of the teacher
      * @return a Flux containing StudentDTOs of the associated students
      */
-    public Flux<StudentDto> getStudentsByTeacherId(Long teacherId) {
+    public Flux<StudentResponseDto> getStudentsByTeacherId(Long teacherId) {
         return courseRepository.findByInstructorId(teacherId)
                 .flatMap(course -> enrollmentRepository.findByCourseId(course.getId()))
                 .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId()))

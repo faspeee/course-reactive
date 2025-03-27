@@ -64,6 +64,9 @@ public class Course {
 
     @Transient
     private List<Long> prerequisiteIds; // Loaded separately in service
+
+    @Transient
+    private String identifier;
 }
 
 
