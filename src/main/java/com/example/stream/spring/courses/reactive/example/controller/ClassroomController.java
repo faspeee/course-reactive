@@ -45,8 +45,8 @@ public class ClassroomController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of departments",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ClassroomResponseDto.class)))
-    @GetMapping("/getAllDepartment")
-    public Flux<ClassroomResponseDto> findAllDepartments() {
+    @GetMapping("/getAllClassroom")
+    public Flux<ClassroomResponseDto> findAllClassrooms() {
         return classroomService.getAllClassrooms();
     }
 
@@ -63,10 +63,10 @@ public class ClassroomController {
                             schema = @Schema(implementation = ClassroomResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Department not found")
     })
-    @GetMapping(value = "/getDepartment", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getClassroom", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<ClassroomResponseDto>> getClassroom(
-            @Parameter(description = "ID of the department to be retrieved") @RequestParam("departmentId") long departmentId) {
-        return classroomService.getClassroomById(departmentId)
+            @Parameter(description = "ID of the department to be retrieved") @RequestParam("classroomId") long classroomId) {
+        return classroomService.getClassroomById(classroomId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -81,7 +81,7 @@ public class ClassroomController {
     @ApiResponse(responseCode = "201", description = "Department successfully created",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ClassroomResponseDto.class)))
-    @PostMapping(value = "/addDepartment", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/addClassroom", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ClassroomResponseDto> addClassroom(
             @Parameter(description = "Department details for the new department") @RequestBody ClassroomRequestDto classroomRequestDto) {
@@ -101,7 +101,7 @@ public class ClassroomController {
                             schema = @Schema(implementation = ClassroomResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Department not found")
     })
-    @PutMapping(value = "/updateDepartment", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/updateClassroom", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<ClassroomResponseDto>> updateClassroom(
             @Parameter(description = "Updated department details") @RequestBody ClassroomRequestDto classroomRequestDto, @RequestParam long classroomId) {
         return classroomService.updateClassroom(classroomId, classroomRequestDto)
@@ -117,7 +117,7 @@ public class ClassroomController {
      */
     @Operation(summary = "Delete a department by ID", description = "Removes a department from the system based on its unique identifier.")
     @ApiResponse(responseCode = "204", description = "Department successfully deleted")
-    @DeleteMapping("/deleteDepartment")
+    @DeleteMapping("/deleteClassroom")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteClassroom(
             @Parameter(description = "ID of the department to be deleted") @RequestParam("classroomId") long classroomId) {
