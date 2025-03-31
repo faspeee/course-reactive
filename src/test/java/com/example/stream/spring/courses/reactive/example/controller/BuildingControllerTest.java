@@ -30,7 +30,7 @@ class BuildingControllerTest {
 
     @Test
     void get_building_test() {
-        long buildingId = 1; // Replace with a valid course ID
+        long buildingId = 2; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/building/getBuildingById")
                         .queryParam("buildingId", buildingId)
                         .build())
@@ -66,7 +66,7 @@ class BuildingControllerTest {
     @DisplayName("adding building in campus that not exist return error")
     @Test
     void add_building_error_test() {
-        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 220L, "identifier");
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "ZZT911", 220L, "identifier");
         // Set other properties as needed
         webTestClient.post().uri("/building/addBuilding")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -90,8 +90,10 @@ class BuildingControllerTest {
         BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", 1L, "identifier");
 
         // Set other properties as needed
-
-        webTestClient.put().uri("/building/updateBuilding")
+        Long buildingId = 1L;
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path("/building/updateBuilding")
+                        .queryParam("buildingId", buildingId)
+                        .build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existedBuilding)
                 .exchange()

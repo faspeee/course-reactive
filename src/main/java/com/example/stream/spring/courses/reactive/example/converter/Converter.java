@@ -19,4 +19,6 @@ public interface Converter<DI, DO, E> {
     }
 
     E toEntity(DI dto);
+
+    E toEntity(Long id, DI dto);
 }
