@@ -142,7 +142,7 @@ CREATE TABLE building
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     version    BIGINT,
-    FOREIGN KEY (campus_id) REFERENCES campus (id)
+    FOREIGN KEY (campus_id) REFERENCES campus (id) ON DELETE CASCADE
 );
 
 -- Classroom Table
@@ -155,7 +155,7 @@ CREATE TABLE classroom
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     version     BIGINT,
-    FOREIGN KEY (building_id) REFERENCES building (id)
+    FOREIGN KEY (building_id) REFERENCES building (id) ON DELETE CASCADE
 );
 INSERT INTO university (name, country, city, location, established, accreditation, president, student_count, website,
                         contact_email, phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs,
