@@ -74,10 +74,10 @@ public class CampusController {
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     @PostMapping("/addCampus")
-    public ResponseEntity<Mono<CampusResponseDto>> addCampus(
-            @Parameter(description = "Campus details for the new campus") @RequestBody CampusRequestDto campusRequestDto) {
-        Mono<CampusResponseDto> campus = campusService.addCampus(campusRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(campus);
+    public ResponseEntity<Mono<CampusResponseDto>> addCampus(@RequestBody CampusRequestDto campusRequestDto) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(campusService.addCampus(campusRequestDto));
     }
 
     /**
