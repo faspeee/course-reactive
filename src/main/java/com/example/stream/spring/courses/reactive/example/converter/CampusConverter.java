@@ -20,8 +20,9 @@ public class CampusConverter implements Converter<CampusRequestDto, CampusRespon
         entity.setUniversityId(dto.universityId());
         entity.setCountry(dto.country());
         entity.setCity(dto.city());
+        entity.setName(dto.name());
         //TODO: understand when is update and when is create
-        return null;
+        return entity;
     }
 
     @Override

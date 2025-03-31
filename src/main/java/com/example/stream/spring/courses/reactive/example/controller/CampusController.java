@@ -3,6 +3,7 @@ package com.example.stream.spring.courses.reactive.example.controller;
 import com.example.stream.spring.courses.reactive.example.model.request.CampusRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CampusResponseDto;
 import com.example.stream.spring.courses.reactive.example.service.CampusService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -30,12 +31,16 @@ public class CampusController {
 
     @PostMapping("/addCampus")
     public ResponseEntity<Mono<CampusResponseDto>> addCampus(@RequestBody CampusRequestDto campusRequestDto) {
-        return ResponseEntity.ok().body(campusService.addCampus(campusRequestDto));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(campusService.addCampus(campusRequestDto));
     }
 
     @DeleteMapping("/deleteCampus")
     public ResponseEntity<Mono<Void>> deleteCampus(@RequestParam Long campusId) {
-        return ResponseEntity.ok().body(campusService.deleteCampus(campusId));
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(campusService.deleteCampus(campusId));
     }
 
     @PutMapping("/updateCampus")
