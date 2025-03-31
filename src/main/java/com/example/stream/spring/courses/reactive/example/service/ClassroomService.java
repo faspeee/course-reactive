@@ -38,10 +38,8 @@ public class ClassroomService {
 
     public Mono<ClassroomResponseDto> updateClassroom(Long classroomId, ClassroomRequestDto classroomRequestDto) {
         return classroomRepository.findById(classroomId)
-                .flatMap(existingClassroom -> {
-                    updateEntity(existingClassroom, classroomRequestDto);
-                    return classroomRepository.save(existingClassroom);
-                })
+                .flatMap(existingClassroom -> classroomRepository
+                        .save(converter.toEntity(classroomRequestDto)))
                 .map(converter::toDto)
                 .switchIfEmpty(Mono.empty()); // Returns empty Mono if not found
     }

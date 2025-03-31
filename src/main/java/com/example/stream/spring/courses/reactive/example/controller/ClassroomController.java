@@ -2,6 +2,7 @@ package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.request.ClassroomRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.ClassroomResponseDto;
+import com.example.stream.spring.courses.reactive.example.service.ClassroomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,7 +47,7 @@ public class ClassroomController {
                     schema = @Schema(implementation = ClassroomResponseDto.class)))
     @GetMapping("/getAllDepartment")
     public Flux<ClassroomResponseDto> findAllDepartments() {
-        return classroomService.getAllDepartments();
+        return classroomService.getAllClassrooms();
     }
 
     /**
@@ -65,7 +66,7 @@ public class ClassroomController {
     @GetMapping(value = "/getDepartment", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<ClassroomResponseDto>> getClassroom(
             @Parameter(description = "ID of the department to be retrieved") @RequestParam("departmentId") long departmentId) {
-        return classroomService.getDepartmentById(departmentId)
+        return classroomService.getClassroomById(departmentId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -84,7 +85,7 @@ public class ClassroomController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ClassroomResponseDto> addClassroom(
             @Parameter(description = "Department details for the new department") @RequestBody ClassroomRequestDto classroomRequestDto) {
-        return classroomService.addDepartment(classroomRequestDto);
+        return classroomService.addClassroom(classroomRequestDto);
     }
 
     /**
@@ -102,8 +103,8 @@ public class ClassroomController {
     })
     @PutMapping(value = "/updateDepartment", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<ClassroomResponseDto>> updateClassroom(
-            @Parameter(description = "Updated department details") @RequestBody ClassroomRequestDto classroomRequestDto) {
-        return classroomService.updateDepartment(classroomRequestDto)
+            @Parameter(description = "Updated department details") @RequestBody ClassroomRequestDto classroomRequestDto, @RequestParam long classroomId) {
+        return classroomService.updateClassroom(classroomId, classroomRequestDto)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -120,6 +121,6 @@ public class ClassroomController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteClassroom(
             @Parameter(description = "ID of the department to be deleted") @RequestParam("classroomId") long classroomId) {
-        return classroomService.deleteDepartment(classroomId);
+        return classroomService.deleteClassroom(classroomId);
     }
 }
