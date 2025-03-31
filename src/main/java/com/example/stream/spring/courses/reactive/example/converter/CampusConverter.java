@@ -16,11 +16,12 @@ public class CampusConverter implements Converter<CampusRequestDto, CampusRespon
     @Override
     public Campus toEntity(CampusRequestDto dto) {
         Campus entity = new Campus();
+        entity.setName(dto.name());
         entity.setAddress(dto.address());
         entity.setUniversityId(dto.universityId());
         entity.setCountry(dto.country());
         entity.setCity(dto.city());
         //TODO: understand when is update and when is create
-        return null;
+        return entity;
     }
 }
