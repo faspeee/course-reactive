@@ -5,6 +5,8 @@ import com.example.stream.spring.courses.reactive.example.model.request.CollegeR
 import com.example.stream.spring.courses.reactive.example.model.response.CollegeResponseDto;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CollegeConverter implements Converter<CollegeRequestDto, CollegeResponseDto, College> {
     @Override
@@ -15,6 +17,19 @@ public class CollegeConverter implements Converter<CollegeRequestDto, CollegeRes
 
     @Override
     public College toEntity(CollegeRequestDto dto) {
-        return null;
+        College college = new College();
+        college.setDean(dto.dean());
+        college.setUniversityId(dto.universityId());
+        college.setName(dto.name());
+        college.setIdentifier(dto.identifier());
+        college.setCreatedAt(LocalDateTime.now());
+        return college;
+    }
+
+    @Override
+    public College toEntity(Long id, CollegeRequestDto dto) {
+        College college = toEntity(dto);
+        college.setId(id);
+        return college;
     }
 }
