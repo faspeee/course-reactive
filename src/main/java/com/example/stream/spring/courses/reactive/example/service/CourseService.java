@@ -52,6 +52,7 @@ public class CourseService {
     }
 
     public Mono<CourseResponseDto> updateCourse(CourseRequestDto courseDto) {
+        // fixme Amigo Fabi mi sa che questo aggiunge non modifica, manca l'id in courseRequest
         return courseRepository.save(converter.toEntity(courseDto))
                 .map(converter::toDto);
     }

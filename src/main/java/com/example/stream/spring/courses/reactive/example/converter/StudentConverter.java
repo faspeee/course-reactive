@@ -30,4 +30,11 @@ public class StudentConverter implements Converter<StudentRequestDto, StudentRes
         return null;
     }
 
+    @Override
+    public Student toEntity(Long id, StudentRequestDto dto) {
+        Student student = toEntity(dto);
+        student.setId(id);
+        return student;
+    }
+
 }

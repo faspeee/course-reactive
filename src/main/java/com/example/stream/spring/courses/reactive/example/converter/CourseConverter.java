@@ -26,4 +26,11 @@ public class CourseConverter implements Converter<CourseRequestDto, CourseRespon
         course.setDepartmentId(dto.departmentId());
         return course;
     }
+
+    @Override
+    public Course toEntity(Long id, CourseRequestDto dto) {
+        Course course = toEntity(dto);
+        course.setId(id);
+        return course;
+    }
 }

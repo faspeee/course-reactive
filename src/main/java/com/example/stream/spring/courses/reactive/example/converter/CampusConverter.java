@@ -24,4 +24,11 @@ public class CampusConverter implements Converter<CampusRequestDto, CampusRespon
         //TODO: understand when is update and when is create
         return entity;
     }
+
+    @Override
+    public Campus toEntity(Long id, CampusRequestDto dto) {
+        Campus entity = toEntity(dto);
+        entity.setId(id);
+        return entity;
+    }
 }

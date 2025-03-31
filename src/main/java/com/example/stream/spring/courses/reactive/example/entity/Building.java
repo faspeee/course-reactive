@@ -34,4 +34,5 @@ public class Building {
     @Transient
     private String identifier;
 
+
 }
