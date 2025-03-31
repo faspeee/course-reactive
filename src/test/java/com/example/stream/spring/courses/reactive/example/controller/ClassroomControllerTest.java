@@ -28,15 +28,15 @@ class ClassroomControllerTest {
 
     @Test
     void find_all_departments() {
-        webTestClient.get().uri("/classroom/getAllDepartment")
+        webTestClient.get().uri("/classroom/getAllClassroom")
                 .exchange().expectStatus().isOk();
     }
 
     @Test
     void get_classroom_test() {
-        long departmentId = 1; // Replace with a valid course ID
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/classroom/getDepartment")
-                        .queryParam("deparmentId", departmentId)
+        long classroomId = 1; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/classroom/getClassroom")
+                        .queryParam("classroomId", classroomId)
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -53,7 +53,7 @@ class ClassroomControllerTest {
         ClassroomRequestDto newClassroom = createClassroomDto(1L, "XVI", 10, "id");
         // Set other properties as needed
 
-        webTestClient.post().uri("/classroom/addDepartment")
+        webTestClient.post().uri("/classroom/addClassroom")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(newClassroom)
                 .exchange()
@@ -73,7 +73,7 @@ class ClassroomControllerTest {
         ClassroomRequestDto newClassroom = createClassroomDto(11111L, "XVI", 10, "id2");
         // Set other properties as needed
 
-        webTestClient.post().uri("/classroom/addDepartment")
+        webTestClient.post().uri("/classroom/addClassroom")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(newClassroom)
                 .exchange()
@@ -82,8 +82,8 @@ class ClassroomControllerTest {
 
     @Test
     void delete_classroom_test() {
-        long classroomId = 1; // Replace with a valid course ID to delete
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/classroom/deleteDepartment")
+        long classroomId = 2; // Replace with a valid course ID to delete
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/classroom/deleteClassroom")
                         .queryParam("classroomId", classroomId)
                         .build())
                 .exchange()
@@ -92,11 +92,12 @@ class ClassroomControllerTest {
 
     @Test
     void update_classroom_test() {
+        long classroomId = 1;
         ClassroomRequestDto existingClassroom = createClassroomDto(1L, "XVIII", 10, "id3");
 
         // Set other properties as needed
 
-        webTestClient.put().uri("/classroom/updateDepartment")
+        webTestClient.put().uri("/classroom/updateClassroom?classroomId=" + classroomId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existingClassroom)
                 .exchange()
