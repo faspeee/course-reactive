@@ -58,7 +58,7 @@ public class BuildingController {
     })
     @GetMapping("/getBuildingById")
     public Mono<BuildingResponseDto> getBuildingById(
-            @Parameter(description = "ID of the building to be retrieved") @RequestParam long buildingId) {
+            @Parameter(description = "ID of the building to be retrieved") @RequestParam String buildingId) {
         return buildingService.getBuildingById(buildingId);
     }
 
@@ -75,8 +75,8 @@ public class BuildingController {
     })
     @PostMapping("/addBuilding")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<BuildingResponseDto> createBuilding(
-            @Parameter(description = "Building details for the new building") @RequestBody BuildingRequestDto buildingRequestDto) {
+    public Mono<BuildingResponseDto> createBuilding(@Parameter(description = "Building details for the new building")
+                                                    @RequestBody BuildingRequestDto buildingRequestDto) {
         return buildingService.createBuilding(buildingRequestDto)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST)));
     }
@@ -94,8 +94,7 @@ public class BuildingController {
     })
     @DeleteMapping("/deleteBuilding")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> deleteBuilding(
-            @Parameter(description = "ID of the building to be deleted") @RequestParam long buildingId) {
+    public Mono<Void> deleteBuilding(@Parameter(description = "ID of the building to be deleted") @RequestParam String buildingId) {
         return buildingService.deleteBuilding(buildingId);
     }
 
@@ -113,7 +112,7 @@ public class BuildingController {
     })
     @PutMapping("/updateBuilding")
     public Mono<BuildingResponseDto> updateBuilding(
-            @Parameter(description = "ID of the building to be updated") @RequestParam long buildingId,
+            @Parameter(description = "ID of the building to be updated") @RequestParam String buildingId,
             @Parameter(description = "Updated building details") @RequestBody BuildingRequestDto buildingRequestDto) {
         return buildingService.updateBuilding(buildingId, buildingRequestDto)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));

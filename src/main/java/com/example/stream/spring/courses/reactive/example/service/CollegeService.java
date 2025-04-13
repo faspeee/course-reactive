@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 /**
  * Service class for managing college entities in a reactive manner.
  * Provides methods for retrieving, creating, updating, and deleting colleges.
@@ -41,8 +43,8 @@ public class CollegeService {
      * @param collegeId the unique identifier of the college
      * @return a {@link Mono} emitting the {@link CollegeResponseDto} if found, or empty if not found
      */
-    public Mono<CollegeResponseDto> getCollege(long collegeId) {
-        return collegeRepository.findById(collegeId)
+    public Mono<CollegeResponseDto> getCollege(String collegeId) {
+        return collegeRepository.findById(UUID.fromString(collegeId))
                 .map(converter::toDto);
     }
 
@@ -65,7 +67,7 @@ public class CollegeService {
      * @throws ResponseStatusException if the associated university is not found
      */
     public Mono<CollegeResponseDto> addCollegeDto(CollegeRequestDto collegeRequestDto) {
-        return universityRepository.findById(collegeRequestDto.universityId())
+        return universityRepository.findById(UUID.fromString(collegeRequestDto.universityId()))
                 .flatMap(university -> collegeRepository.save(converter.toEntity(collegeRequestDto))
                         .map(converter::toDto))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The university is not found")));
@@ -77,7 +79,7 @@ public class CollegeService {
      * @param collegeRequestDto the data transfer object containing updated college details
      * @return a {@link Mono} emitting the updated {@link CollegeResponseDto}
      */
-    public Mono<CollegeResponseDto> updateCollegeDto(CollegeRequestDto collegeRequestDto) {
+    public Mono<CollegeResponseDto> updateCollegeDto(String collegeId, CollegeRequestDto collegeRequestDto) {
         return collegeRepository.save(converter.toEntity(collegeRequestDto))
                 .map(converter::toDto);
     }
@@ -88,7 +90,7 @@ public class CollegeService {
      * @param collegeId the unique identifier of the college to delete
      * @return a {@link Mono} that completes when the deletion is done
      */
-    public Mono<Void> deleteCollegeDto(long collegeId) {
-        return collegeRepository.deleteById(collegeId);
+    public Mono<Void> deleteCollegeDto(String collegeId) {
+        return collegeRepository.deleteById(UUID.fromString(collegeId));
     }
 }

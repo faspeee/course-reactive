@@ -17,7 +17,7 @@ class CollegeControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CollegeRequestDto createCollegeDto(String name, String dean, Long universityId, String identifier) {
+    private static CollegeRequestDto createCollegeDto(String name, String dean, String universityId, String identifier) {
         return new CollegeRequestDto(name, dean, universityId, identifier);
     }
 
@@ -50,7 +50,7 @@ class CollegeControllerTest {
 
     @Test
     void add_college_test() {
-        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", 1L, "id 3");
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "1L", "id 3");
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -70,7 +70,7 @@ class CollegeControllerTest {
     @DisplayName("add college in university that not exist, return error")
     @Test
     void add_college_error_test() {
-        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", 2231L, "id 2");
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "2231L", "id 2");
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -92,7 +92,7 @@ class CollegeControllerTest {
 
     @Test
     void update_college_test() {
-        CollegeRequestDto existingCollege = createCollegeDto("John week", "that is it", 1L, "id");
+        CollegeRequestDto existingCollege = createCollegeDto("John week", "that is it", "1L", "id");
 
         // Set other properties as needed
 

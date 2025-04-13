@@ -58,7 +58,7 @@ public class CampusController {
     })
     @GetMapping("/getCampus")
     public ResponseEntity<Mono<CampusResponseDto>> getCampus(
-            @Parameter(description = "ID of the campus to be retrieved") @RequestParam Long campusId) {
+            @Parameter(description = "ID of the campus to be retrieved") @RequestParam String campusId) {
         return ResponseEntity.ok().body(campusService.getCampus(campusId));
     }
 
@@ -93,8 +93,9 @@ public class CampusController {
     })
     @PutMapping("/updateCampus")
     public ResponseEntity<Mono<CampusResponseDto>> updateCampus(
+            @Parameter(description = "ID of the campus to be updated") @RequestParam String campusId,
             @Parameter(description = "Updated campus details") @RequestBody CampusRequestDto campusRequestDto) {
-        return ResponseEntity.ok().body(campusService.updateCampus(campusRequestDto));
+        return ResponseEntity.ok().body(campusService.updateCampus(campusId, campusRequestDto));
     }
 
     /**
@@ -110,7 +111,7 @@ public class CampusController {
     })
     @DeleteMapping("/deleteCampus")
     public ResponseEntity<Mono<Void>> deleteCampus(
-            @Parameter(description = "ID of the campus to be deleted") @RequestParam Long campusId) {
+            @Parameter(description = "ID of the campus to be deleted") @RequestParam String campusId) {
         return ResponseEntity.ok().body(campusService.deleteCampus(campusId));
     }
 }

@@ -6,12 +6,13 @@ import com.example.stream.spring.courses.reactive.example.model.response.Buildin
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 public class BuildingConverter implements Converter<BuildingRequestDto, BuildingResponseDto, Building> {
     @Override
     public BuildingResponseDto toDto(Building building) {
-        return new BuildingResponseDto(building.getName(), building.getCode(), building.getCampusId(),
+        return new BuildingResponseDto(building.getId().toString(), building.getName(), building.getCode(), building.getCampusId().toString(),
                 building.getCreatedAt(), building.getUpdatedAt(), building.getIdentifier());
     }
 
@@ -20,7 +21,7 @@ public class BuildingConverter implements Converter<BuildingRequestDto, Building
         Building building = new Building();
         building.setName(dto.name());
         building.setCode(dto.code());
-        building.setCampusId(dto.campusId());
+        building.setCampusId(UUID.fromString(dto.campusId()));
         building.setCreatedAt(LocalDateTime.now());
         return building;
     }

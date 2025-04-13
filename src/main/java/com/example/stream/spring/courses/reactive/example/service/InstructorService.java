@@ -8,6 +8,8 @@ import com.example.stream.spring.courses.reactive.example.repository.StudentRepo
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.UUID;
+
 /**
  * Service class for handling business logic related to teachers.
  */
@@ -43,8 +45,8 @@ public class InstructorService {
      * @param teacherId the ID of the teacher
      * @return a Flux containing StudentDTOs of the associated students
      */
-    public Flux<StudentResponseDto> getStudentsByTeacherId(Long teacherId) {
-        return courseRepository.findByInstructorId(teacherId)
+    public Flux<StudentResponseDto> getStudentsByTeacherId(String teacherId) {
+        return courseRepository.findByInstructorId(UUID.fromString(teacherId))
                 .flatMap(course -> enrollmentRepository.findByCourseId(course.getId()))
                 .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId()))
                 .map(studentConverter::toDto)

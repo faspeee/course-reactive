@@ -57,7 +57,7 @@ class UniversityControllerTest {
 
     @Test
     void add_university_test() {
-        UniversityRequestDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield UniversityService", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
@@ -74,14 +74,14 @@ class UniversityControllerTest {
                     UniversityResponseDto createdUniversity = response.getResponseBody();
                     assertNotNull(createdUniversity);
                     assertNotNull(createdUniversity.accreditation());
-                    assertEquals("Springfield University", createdUniversity.name());
+                    assertEquals("Springfield UniversityService", createdUniversity.name());
                 });
     }
 
     @DisplayName("add a university on city that not exist return error message")
     @Test
     void add_university_error_test() {
-        UniversityRequestDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield UniversityService", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission 2", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
@@ -98,7 +98,7 @@ class UniversityControllerTest {
     @DisplayName("add a university on country that not exist return error message")
     @Test
     void add_university_error_2_test() {
-        UniversityRequestDto newUniversity = createUniversityDto("Springfield University", "742 Evergreen Terrace, Springfield",
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield UniversityService", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission 2", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
@@ -124,7 +124,7 @@ class UniversityControllerTest {
 
     @Test
     void update_university_test() {
-        UniversityRequestDto existingUniversity = createUniversityDto("Guantanamo University", "742 Evergreen Terrace, Springfield",
+        UniversityRequestDto existingUniversity = createUniversityDto("Guantanamo UniversityService", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
                 "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
@@ -141,7 +141,7 @@ class UniversityControllerTest {
                 .consumeWith(response -> {
                     UniversityResponseDto updateUniversity = response.getResponseBody();
                     assertNotNull(updateUniversity);
-                    assertEquals("Guantanamo University", updateUniversity.name());
+                    assertEquals("Guantanamo UniversityService", updateUniversity.name());
                 });
     }
 }

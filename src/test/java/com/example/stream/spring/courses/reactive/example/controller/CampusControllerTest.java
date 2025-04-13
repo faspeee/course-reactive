@@ -19,7 +19,7 @@ class CampusControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CampusRequestDto createCampusDto(String name, String address, Long universityId,
+    private static CampusRequestDto createCampusDto(String name, String address, String universityId,
                                                     LocalDateTime startDate, LocalDateTime endDate,
                                                     String identifier, String country, String city) {
         return new CampusRequestDto(name, address, universityId, country, city, startDate, endDate, identifier);
@@ -54,7 +54,7 @@ class CampusControllerTest {
 
     @Test
     void add_campus_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L,
+        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", "1L",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
                 "identifier", "Italy", "Napoli");
         // Set other properties as needed
@@ -76,7 +76,7 @@ class CampusControllerTest {
     @DisplayName("add campus on country that not exist return error")
     @Test
     void add_campus_error_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L,
+        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", "1L",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
                 "identifier 2", "Lavazza", "Napoli");
         // Set other properties as needed
@@ -91,7 +91,7 @@ class CampusControllerTest {
     @DisplayName("add campus on city that not exist on the country return error")
     @Test
     void add_campus_error_2_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", 1L,
+        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", "1L",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
                 "identifier 2", "Spain", "Napoli");
         // Set other properties as needed
@@ -115,7 +115,7 @@ class CampusControllerTest {
 
     @Test
     void update_campus_test() {
-        CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", 1L,
+        CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", "1L",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
                 "identifier 2", "Italy", "Napoli");
 

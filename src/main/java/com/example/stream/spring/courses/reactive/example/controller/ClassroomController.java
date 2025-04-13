@@ -53,7 +53,7 @@ public class ClassroomController {
     /**
      * Retrieves a department by its unique identifier.
      *
-     * @param departmentId the unique identifier of the department
+     * @param classroomId the unique identifier of the department
      * @return a {@link Mono} emitting the {@link ClassroomResponseDto} if found
      */
     @Operation(summary = "Retrieve a department by ID", description = "Fetches a department based on its unique identifier.")
@@ -65,7 +65,7 @@ public class ClassroomController {
     })
     @GetMapping(value = "/getClassroom", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<ClassroomResponseDto>> getClassroom(
-            @Parameter(description = "ID of the department to be retrieved") @RequestParam("classroomId") long classroomId) {
+            @Parameter(description = "ID of the department to be retrieved") @RequestParam("classroomId") String classroomId) {
         return classroomService.getClassroomById(classroomId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -103,7 +103,8 @@ public class ClassroomController {
     })
     @PutMapping(value = "/updateClassroom", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<ClassroomResponseDto>> updateClassroom(
-            @Parameter(description = "Updated department details") @RequestBody ClassroomRequestDto classroomRequestDto, @RequestParam long classroomId) {
+            @Parameter(description = "Updated department details") @RequestBody ClassroomRequestDto classroomRequestDto,
+            @RequestParam String classroomId) {
         return classroomService.updateClassroom(classroomId, classroomRequestDto)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -120,7 +121,7 @@ public class ClassroomController {
     @DeleteMapping("/deleteClassroom")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteClassroom(
-            @Parameter(description = "ID of the department to be deleted") @RequestParam("classroomId") long classroomId) {
+            @Parameter(description = "ID of the department to be deleted") @RequestParam("classroomId") String classroomId) {
         return classroomService.deleteClassroom(classroomId);
     }
 }

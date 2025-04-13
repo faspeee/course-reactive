@@ -46,7 +46,7 @@ class BuildingControllerTest {
 
     @Test
     void add_building_test() {
-        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", 2L, "identifier");
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", "2L", "identifier");
         // Set other properties as needed
 
         webTestClient.post().uri("/building/addBuilding")
@@ -66,7 +66,7 @@ class BuildingControllerTest {
     @DisplayName("adding building in campus that not exist return error")
     @Test
     void add_building_error_test() {
-        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "ZZT911", 220L, "identifier");
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "ZZT911", "220L", "identifier");
         // Set other properties as needed
         webTestClient.post().uri("/building/addBuilding")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +87,7 @@ class BuildingControllerTest {
 
     @Test
     void update_building_test() {
-        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", 1L, "identifier");
+        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "1L", "identifier");
 
         // Set other properties as needed
         Long buildingId = 1L;
@@ -106,7 +106,7 @@ class BuildingControllerTest {
                 });
     }
 
-    private BuildingRequestDto createBuildingDto(String name, String code, Long campusId, String identifier) {
+    private BuildingRequestDto createBuildingDto(String name, String code, String campusId, String identifier) {
         return new BuildingRequestDto(name, code, campusId, identifier);
     }
 
