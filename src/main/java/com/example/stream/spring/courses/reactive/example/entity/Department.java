@@ -40,7 +40,7 @@ public class Department {
     private String identifier;
 
     @Column("college_id")
-    private long collegeId;
+    private UUID collegeId;
 
     @CreatedDate
     @Column("created_at")

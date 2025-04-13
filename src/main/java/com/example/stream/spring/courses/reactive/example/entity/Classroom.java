@@ -19,7 +19,7 @@ public class Classroom {
     private UUID id;
 
     @Column("building_id")
-    private Long buildingId;
+    private UUID buildingId;
 
     @Column("room_number")
     private String roomNumber;

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class CourseConverter implements Converter<CourseRequestDto, CourseResponseDto, Course> {
     @Override
     public CourseResponseDto toDto(Course entity) {
-        return new CourseResponseDto(entity.getCourseName(), entity.getCourseCode(),
+        return new CourseResponseDto(entity.getId().toString(), entity.getCourseName(), entity.getCourseCode(),
                 entity.getStartDate(), entity.getEndDate(), entity.getCreditHours(),
                 entity.getDepartmentId(), entity.getIdentifier());
     }
@@ -26,5 +26,5 @@ public class CourseConverter implements Converter<CourseRequestDto, CourseRespon
         course.setDepartmentId(dto.departmentId());
         return course;
     }
- 
+
 }

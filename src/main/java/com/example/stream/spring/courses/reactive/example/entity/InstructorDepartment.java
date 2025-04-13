@@ -21,9 +21,9 @@ public class InstructorDepartment {
     private UUID id;
 
     @Column("instructor_id")
-    private Long instructorId;
+    private UUID instructorId;
 
     @Column("department_id")
-    private Long departmentId;
+    private UUID departmentId;
 
 }

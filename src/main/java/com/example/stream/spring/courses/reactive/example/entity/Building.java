@@ -22,7 +22,7 @@ public class Building {
     private String code;
 
     @Column("campus_id")
-    private Long campusId;
+    private UUID campusId;
 
     @Column("created_at")
     private LocalDateTime createdAt;

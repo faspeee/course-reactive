@@ -22,10 +22,10 @@ public class Enrollment {
     private UUID id;
 
     @Column("student_id")
-    private Long studentId;
+    private UUID studentId;
 
     @Column("course_id")
-    private Long courseId;
+    private UUID courseId;
 
     @Column("enrolled_at")
     private LocalDateTime enrolledAt;

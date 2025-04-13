@@ -21,8 +21,8 @@ public class CoursePrerequisite {
     private UUID id;
 
     @Column("course_id")
-    private Long courseId;
+    private UUID courseId;
 
     @Column("prerequisite_id")
-    private Long prerequisiteId;
+    private UUID prerequisiteId;
 }

@@ -22,7 +22,7 @@ public class College {
     private String dean;
 
     @Column("university_id")
-    private Long universityId;
+    private UUID universityId;
 
     @Column("created_at")
     private LocalDateTime createdAt;
