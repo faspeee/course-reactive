@@ -26,10 +26,4 @@ public class CampusConverter implements Converter<CampusRequestDto, CampusRespon
         return entity;
     }
 
-    @Override
-    public Campus toEntity(Long id, CampusRequestDto dto) {
-        Campus entity = toEntity(dto);
-        entity.setId(id);
-        return entity;
-    }
 }

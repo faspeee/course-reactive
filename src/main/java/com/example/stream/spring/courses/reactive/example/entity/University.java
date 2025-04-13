@@ -8,6 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table("university")
 @Getter
@@ -16,7 +17,7 @@ public class University {
 
     @Id
     @Column("id")
-    private Long id;
+    private UUID id;
 
     @Column("name")
     private String name;

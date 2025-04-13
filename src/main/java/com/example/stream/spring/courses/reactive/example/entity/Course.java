@@ -15,6 +15,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -24,7 +25,7 @@ import java.util.List;
 public class Course {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @NotBlank
     @Size(max = 100)

@@ -14,6 +14,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 public class Department {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @NotBlank
     @Size(min = 2, max = 100)

@@ -25,11 +25,4 @@ public class CollegeConverter implements Converter<CollegeRequestDto, CollegeRes
         college.setCreatedAt(LocalDateTime.now());
         return college;
     }
-
-    @Override
-    public College toEntity(Long id, CollegeRequestDto dto) {
-        College college = toEntity(dto);
-        college.setId(id);
-        return college;
-    }
 }

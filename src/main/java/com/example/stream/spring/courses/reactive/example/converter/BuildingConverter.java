@@ -25,11 +25,4 @@ public class BuildingConverter implements Converter<BuildingRequestDto, Building
         return building;
     }
 
-    @Override
-    public Building toEntity(Long id, BuildingRequestDto dto) {
-        Building building = toEntity(dto);
-        building.setId(id);
-        return building;
-    }
-
 }
