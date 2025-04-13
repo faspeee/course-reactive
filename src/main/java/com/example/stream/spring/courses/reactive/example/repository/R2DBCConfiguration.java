@@ -11,11 +11,11 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 @Configuration
 @EnableR2dbcRepositories
 class R2DBCConfiguration {
-  @Bean
-  public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
-    ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
-    initializer.setConnectionFactory(connectionFactory);
-    initializer.setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("sql/course.sql")));
-    return initializer;
-  }
+    @Bean
+    public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
+        ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
+        initializer.setConnectionFactory(connectionFactory);
+        initializer.setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("db/sql/course.sql")));
+        return initializer;
+    }
 }
