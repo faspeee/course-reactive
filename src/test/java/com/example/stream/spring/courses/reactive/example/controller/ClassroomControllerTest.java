@@ -27,7 +27,7 @@ class ClassroomControllerTest {
     }
 
     @Test
-    void find_all_departments() {
+    void find_all_classroom() {
         webTestClient.get().uri("/classroom/getAllClassroom")
                 .exchange().expectStatus().isOk();
     }

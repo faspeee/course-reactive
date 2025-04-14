@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 --changeset aspeeencinaf:2
 CREATE TABLE IF NOT EXISTS student
 (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     surname    VARCHAR(100) NOT NULL,
     email      VARCHAR(100) NOT NULL,
@@ -37,11 +37,11 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:4
 CREATE TABLE IF NOT EXISTS department
 (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        VARCHAR(100) NOT NULL,
     description VARCHAR(500),
     identifier  VARCHAR(50)  NOT NULL,
-    college_id  BIGINT       NOT NULL,
+    college_id  UUID         NOT NULL,
     created_at  TIMESTAMP,
     updated_at  TIMESTAMP,
     version     BIGINT
@@ -67,7 +67,7 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:6
 CREATE TABLE IF NOT EXISTS instructor
 (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100) NOT NULL,
     email      VARCHAR(100) NOT NULL,
     created_at TIMESTAMP,
@@ -96,8 +96,8 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:8
 CREATE TABLE IF NOT EXISTS instructor_department
 (
-    instructor_id BIGINT NOT NULL,
-    department_id BIGINT NOT NULL,
+    instructor_id UUID NOT NULL,
+    department_id UUID NOT NULL,
     PRIMARY KEY (instructor_id, department_id),
     FOREIGN KEY (instructor_id) REFERENCES instructor (id),
     FOREIGN KEY (department_id) REFERENCES department (id)
@@ -106,16 +106,16 @@ CREATE TABLE IF NOT EXISTS instructor_department
 --changeset aspeeencinaf:9
 CREATE TABLE IF NOT EXISTS course
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     course_name   VARCHAR(100),
     course_code   VARCHAR(50),
     start_date    DATE,
     end_date      DATE,
     credit_hours  INT,
     description   VARCHAR(500),
-    instructor_id BIGINT, -- Now linked to the instructor table
-    is_active     BOOLEAN DEFAULT TRUE,
-    department_id BIGINT NOT NULL,
+    instructor_id UUID, -- Now linked to the instructor table
+    is_active     BOOLEAN          DEFAULT TRUE,
+    department_id UUID NOT NULL,
     FOREIGN KEY (instructor_id) REFERENCES instructor (id),
     FOREIGN KEY (department_id) REFERENCES department (id)
 );
@@ -123,8 +123,8 @@ CREATE TABLE IF NOT EXISTS course
 --changeset aspeeencinaf:10
 CREATE TABLE IF NOT EXISTS enrollment
 (
-    student_id  BIGINT NOT NULL,
-    course_id   BIGINT NOT NULL,
+    student_id  UUID NOT NULL,
+    course_id   UUID NOT NULL,
     enrolled_at TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (student_id, course_id),
     FOREIGN KEY (student_id) REFERENCES student (id),
@@ -134,8 +134,8 @@ CREATE TABLE IF NOT EXISTS enrollment
 --changeset aspeeencinaf:11
 CREATE TABLE IF NOT EXISTS course_prerequisite
 (
-    course_id       BIGINT NOT NULL,
-    prerequisite_id BIGINT NOT NULL,
+    course_id       UUID NOT NULL,
+    prerequisite_id UUID NOT NULL,
     PRIMARY KEY (course_id, prerequisite_id),
     FOREIGN KEY (course_id) REFERENCES course (id),
     FOREIGN KEY (prerequisite_id) REFERENCES course (id)
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS course_prerequisite
 --changeset aspeeencinaf:12
 CREATE TABLE IF NOT EXISTS university
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name          VARCHAR(100) NOT NULL,
     country       VARCHAR(50)  NOT NULL,
     city          VARCHAR(50)  NOT NULL,
@@ -165,8 +165,8 @@ CREATE TABLE IF NOT EXISTS university
     num_programs  INT,            -- Number of academic programs offered
     international BOOLEAN,        -- Indicator if the university has international affiliations
     ranking       INT,            -- National or international ranking position
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT
 );
 
@@ -192,14 +192,14 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:14
 CREATE TABLE IF NOT EXISTS campus
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name          VARCHAR(100) NOT NULL,
     address       VARCHAR(255),
     country       VARCHAR(50)  NOT NULL,
     city          VARCHAR(50)  NOT NULL,
-    university_id BIGINT       NOT NULL,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    university_id UUID         NOT NULL,
+    created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT,
     FOREIGN KEY (university_id) REFERENCES university (id)
 );
@@ -223,12 +223,12 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:16
 CREATE TABLE IF NOT EXISTS college
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name          VARCHAR(100) NOT NULL,
     dean          VARCHAR(100),
-    university_id BIGINT       NOT NULL,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    university_id UUID         NOT NULL,
+    created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT,
     FOREIGN KEY (university_id) REFERENCES university (id)
 );
@@ -254,12 +254,12 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:18
 CREATE TABLE IF NOT EXISTS building
 (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name       VARCHAR(100)       NOT NULL,
     code       VARCHAR(10) UNIQUE NOT NULL,
-    campus_id  BIGINT             NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    campus_id  UUID               NOT NULL,
+    created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version    BIGINT,
     FOREIGN KEY (campus_id) REFERENCES campus (id) ON DELETE CASCADE
 );
@@ -285,12 +285,12 @@ EXECUTE FUNCTION set_updated_at();
 --changeset aspeeencinaf:20
 CREATE TABLE IF NOT EXISTS classroom
 (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    building_id BIGINT      NOT NULL,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    building_id UUID        NOT NULL,
     room_number VARCHAR(10) NOT NULL,
     capacity    INT,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version     BIGINT,
     FOREIGN KEY (building_id) REFERENCES building (id) ON DELETE CASCADE
 );
