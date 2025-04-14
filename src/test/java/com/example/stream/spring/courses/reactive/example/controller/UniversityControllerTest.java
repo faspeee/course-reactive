@@ -41,9 +41,9 @@ class UniversityControllerTest {
 
     @Test
     void get_university_test() {
-        long departmentId = 1; // Replace with a valid course ID
+        String universityId = "068ec73a-5210-4891-b4d2-a988541e3854"; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/university/getUniversity")
-                        .queryParam("deparmentId", departmentId)
+                        .queryParam("universityId", universityId)
                         .build())
                 .exchange()
                 .expectStatus().isOk()
