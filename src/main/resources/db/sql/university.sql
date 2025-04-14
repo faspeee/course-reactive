@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset aspeeencinaf:15
+--changeset aspeeencinaf:22
 INSERT INTO university (name, country, city, location, established, accreditation, president, student_count, website,
                         contact_email, phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs,
                         international, ranking, created_at, updated_at, version)
