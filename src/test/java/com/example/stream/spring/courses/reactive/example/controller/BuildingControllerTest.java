@@ -17,6 +17,10 @@ class BuildingControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
+    private static BuildingRequestDto createBuildingDto(String name, String code, String campusId, String identifier) {
+        return new BuildingRequestDto(name, code, campusId, identifier);
+    }
+
     @Test
     void dummyTest() {
         assertNotNull(webTestClient);
@@ -103,7 +107,7 @@ class BuildingControllerTest {
                     assertEquals("Carlos Filling X", createBuilding.name());
                 }).returnResult().getResponseBody().buildingId();
         BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
-        
+
         // Set other properties as needed
         webTestClient.put().uri(uriBuilder -> uriBuilder.path("/building/updateBuilding")
                         .queryParam("buildingId", buildingId)
@@ -118,10 +122,6 @@ class BuildingControllerTest {
                     assertNotNull(updateBuilding);
                     assertEquals("Carlos Filling", updateBuilding.name());
                 });
-    }
-
-    private BuildingRequestDto createBuildingDto(String name, String code, String campusId, String identifier) {
-        return new BuildingRequestDto(name, code, campusId, identifier);
     }
 
 }
