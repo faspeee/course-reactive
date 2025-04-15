@@ -22,7 +22,7 @@ public class StudentController {
     }
 
 
-    @GetMapping("/getAllStudent")
+    @GetMapping("/getAllStudents")
     public Flux<StudentResponseDto> findAllStudent() {
         return studentService.getAllStudents();
     }
