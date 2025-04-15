@@ -39,6 +39,11 @@ public class DepartmentService {
     }
 
     private Department updateDepartment(Department department, DepartmentRequestDto departmentRequestDto) {
+        department.setCollegeId(UUID.fromString(departmentRequestDto.collegeId()));
+        department.setName(departmentRequestDto.name());
+        department.setIdentifier(departmentRequestDto.identifier());
+        department.setDescription(departmentRequestDto.description());
+        return department;
     }
 
     private Mono<Department> getDepartmentById(UUID departmentId) {
