@@ -112,6 +112,6 @@ public class CampusController {
     @DeleteMapping("/deleteCampus")
     public ResponseEntity<Mono<Void>> deleteCampus(
             @Parameter(description = "ID of the campus to be deleted") @RequestParam String campusId) {
-        return ResponseEntity.ok().body(campusService.deleteCampus(campusId));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(campusService.deleteCampus(campusId));
     }
 }

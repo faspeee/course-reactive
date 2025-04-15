@@ -34,7 +34,7 @@ class ClassroomControllerTest {
 
     @Test
     void get_classroom_test() {
-        long classroomId = 1; // Replace with a valid course ID
+        String classroomId = "76aa28de-baa8-4a90-9a7c-46dfa31da5b8"; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/classroom/getClassroom")
                         .queryParam("classroomId", classroomId)
                         .build())
@@ -50,7 +50,7 @@ class ClassroomControllerTest {
 
     @Test
     void add_classroom_test() {
-        ClassroomRequestDto newClassroom = createClassroomDto("1L", "XVI", 10, "id");
+        ClassroomRequestDto newClassroom = createClassroomDto("3ceaff23-8f6e-4557-9fc6-c294f64063d4", "XVI", 10, "id");
         // Set other properties as needed
 
         webTestClient.post().uri("/classroom/addClassroom")
@@ -70,7 +70,7 @@ class ClassroomControllerTest {
     @DisplayName("add classroom on building that not exist return error")
     @Test
     void add_classroom_error_test() {
-        ClassroomRequestDto newClassroom = createClassroomDto("11111L", "XVI", 10, "id2");
+        ClassroomRequestDto newClassroom = createClassroomDto("3ceaff23-8f6e-4557-9fc6-c294f64063d2", "XVI", 10, "id2");
         // Set other properties as needed
 
         webTestClient.post().uri("/classroom/addClassroom")
@@ -80,9 +80,22 @@ class ClassroomControllerTest {
                 .expectStatus().is4xxClientError();
     }
 
+    @DisplayName("add classroom with erroneous UUID buildingId")
+    @Test
+    void add_classroom_internal_error_test() {
+        ClassroomRequestDto newClassroom = createClassroomDto("111111L", "XVI", 10, "id2");
+        // Set other properties as needed
+
+        webTestClient.post().uri("/classroom/addClassroom")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newClassroom)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
     @Test
     void delete_classroom_test() {
-        long classroomId = 2; // Replace with a valid course ID to delete
+        String classroomId = "ddfb7d3e-c7c8-4495-a1b2-8aa6736f09ca"; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/classroom/deleteClassroom")
                         .queryParam("classroomId", classroomId)
                         .build())
@@ -92,8 +105,24 @@ class ClassroomControllerTest {
 
     @Test
     void update_classroom_test() {
-        long classroomId = 1;
-        ClassroomRequestDto existingClassroom = createClassroomDto("1L", "XVIII", 10, "id3");
+
+        ClassroomRequestDto newClassroom = createClassroomDto("3ceaff23-8f6e-4557-9fc6-c294f64063d4", "XVI", 10, "id");
+        // Set other properties as needed
+
+        String classroomId = webTestClient.post().uri("/classroom/addClassroom")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newClassroom)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(ClassroomResponseDto.class)
+                .consumeWith(response -> {
+                    ClassroomResponseDto createdClassroom = response.getResponseBody();
+                    assertNotNull(createdClassroom);
+                    assertNotNull(createdClassroom.capacity());
+                    assertEquals(10, createdClassroom.capacity());
+                }).returnResult().getResponseBody().classroomId();
+
+        ClassroomRequestDto existingClassroom = createClassroomDto("3ceaff23-8f6e-4557-9fc6-c294f64063d4", "XVIII", 10, "id3");
 
         // Set other properties as needed
 

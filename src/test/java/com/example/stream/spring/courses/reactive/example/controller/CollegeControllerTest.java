@@ -34,7 +34,7 @@ class CollegeControllerTest {
 
     @Test
     void get_college_test() {
-        long collegeId = 1; // Replace with a valid course ID
+        String collegeId = "19902a0f-e444-4118-9fe0-d5d61e3750dc"; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/college/getCollege")
                         .queryParam("collegeId", collegeId)
                         .build())
@@ -50,7 +50,7 @@ class CollegeControllerTest {
 
     @Test
     void add_college_test() {
-        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "1L", "id 3");
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "068ec73a-5210-4891-b4d2-a988541e3854", "id 3");
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -70,7 +70,7 @@ class CollegeControllerTest {
     @DisplayName("add college in university that not exist, return error")
     @Test
     void add_college_error_test() {
-        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "2231L", "id 2");
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "068ec73a-5210-4891-b4d2-a988541e3851", "id 2");
         // Set other properties as needed
 
         webTestClient.post().uri("/college/addCollege")
@@ -80,9 +80,22 @@ class CollegeControllerTest {
                 .expectStatus().is4xxClientError();
     }
 
+    @DisplayName("add college with UUID university erroneous")
+    @Test
+    void add_college_internal_error_test() {
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "1292919L", "id 2");
+        // Set other properties as needed
+
+        webTestClient.post().uri("/college/addCollege")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCollege)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
     @Test
     void delete_college_test() {
-        long collegeId = 1; // Replace with a valid course ID to delete
+        String collegeId = "bf4eecee-cfe9-41fc-b56c-9fefee9da858"; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/college/deleteCollege")
                         .queryParam("collegeId", collegeId)
                         .build())
@@ -92,11 +105,28 @@ class CollegeControllerTest {
 
     @Test
     void update_college_test() {
-        CollegeRequestDto existingCollege = createCollegeDto("John week", "that is it", "1L", "id");
+
+        CollegeRequestDto newCollege = createCollegeDto("John Doe", "that is it", "068ec73a-5210-4891-b4d2-a988541e3854", "id 3");
+        // Set other properties as needed
+
+        String collegeId = webTestClient.post().uri("/college/addCollege")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCollege)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(CollegeResponseDto.class)
+                .consumeWith(response -> {
+                    CollegeResponseDto createdCollege = response.getResponseBody();
+                    assertNotNull(createdCollege);
+                    assertNotNull(createdCollege.universityId());
+                    assertEquals("John Doe", createdCollege.name());
+                }).returnResult().getResponseBody().collegeId();
+
+        CollegeRequestDto existingCollege = createCollegeDto("John week", "that is it", "068ec73a-5210-4891-b4d2-a988541e3854", "id");
 
         // Set other properties as needed
 
-        webTestClient.put().uri("/college/updateCollege")
+        webTestClient.put().uri("/college/updateCollege?collegeId=" + collegeId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existingCollege)
                 .exchange()
