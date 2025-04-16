@@ -46,7 +46,7 @@ public class InstructorController {
             @ApiResponse(responseCode = "404", description = "Teacher not found")
     })
     @GetMapping("/{teacherId}/students")
-    public Flux<StudentResponseDto> getStudentsByTeacher(@PathVariable Long teacherId) {
+    public Flux<StudentResponseDto> getStudentsByTeacher(@PathVariable String teacherId) {
         return instructorService.getStudentsByTeacherId(teacherId);
     }
 }

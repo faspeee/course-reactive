@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 /**
  * Service class for managing campus entities in a reactive manner.
  * Provides methods for retrieving, creating, updating, and deleting campuses.
@@ -45,8 +47,8 @@ public class CampusService {
      * @param campusId the unique identifier of the campus
      * @return a {@link Mono} emitting the {@link CampusResponseDto} if found, or empty if not found
      */
-    public Mono<CampusResponseDto> getCampus(long campusId) {
-        return campusRepository.findById(campusId)
+    public Mono<CampusResponseDto> getCampus(String campusId) {
+        return campusRepository.findById(UUID.fromString(campusId))
                 .map(campusConverter::toDto);
     }
 
@@ -67,8 +69,8 @@ public class CampusService {
      * @param campusId the unique identifier of the campus to delete
      * @return a {@link Mono} that completes when the deletion is done
      */
-    public Mono<Void> deleteCampus(long campusId) {
-        return campusRepository.deleteById(campusId);
+    public Mono<Void> deleteCampus(String campusId) {
+        return campusRepository.deleteById(UUID.fromString(campusId));
     }
 
     /**
@@ -77,7 +79,7 @@ public class CampusService {
      * @param campusRequestDto the data transfer object containing updated campus details
      * @return a {@link Mono} emitting the updated {@link CampusResponseDto}
      */
-    public Mono<CampusResponseDto> updateCampus(CampusRequestDto campusRequestDto) {
+    public Mono<CampusResponseDto> updateCampus(String campusId, CampusRequestDto campusRequestDto) {
         return campusRepository.save(campusConverter.toEntity(campusRequestDto))
                 .map(campusConverter::toDto);
     }

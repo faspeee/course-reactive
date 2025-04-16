@@ -17,7 +17,7 @@ class CourseControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static CourseRequestDto createCourseDto(String courseName, String courseCode, String identifier, int creditHours, long departmentId) {
+    private static CourseRequestDto createCourseDto(String courseName, String courseCode, String identifier, int creditHours, String departmentId) {
         return new CourseRequestDto(courseName, courseCode, creditHours, departmentId, identifier);
     }
 
@@ -50,7 +50,7 @@ class CourseControllerTest {
 
     @Test
     void testAddCourse() {
-        CourseRequestDto newCourse = createCourseDto("New Course", "code course", "id 2", 1, 1);
+        CourseRequestDto newCourse = createCourseDto("New Course", "code course", "id 2", 1, "1");
         // Set other properties as needed
 
         webTestClient.post().uri("/courses/addCourse")
@@ -79,7 +79,7 @@ class CourseControllerTest {
 
     @Test
     void testUpdateCourse() {
-        CourseRequestDto existingCourse = createCourseDto("Updated Course Name", "code course", "id", 2, 2);
+        CourseRequestDto existingCourse = createCourseDto("Updated Course Name", "code course", "id", 2, "2");
 
         // Set other properties as needed
 

@@ -8,6 +8,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table("classroom")
 @Getter
@@ -15,10 +16,10 @@ import java.time.LocalDateTime;
 public class Classroom {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @Column("building_id")
-    private Long buildingId;
+    private UUID buildingId;
 
     @Column("room_number")
     private String roomNumber;

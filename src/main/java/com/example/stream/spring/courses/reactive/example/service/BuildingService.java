@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class BuildingService {
 
@@ -33,31 +35,31 @@ public class BuildingService {
         return buildingRepository.findAll().map(buildingConverter::toDto);
     }
 
-    public Mono<BuildingResponseDto> getBuildingById(long buildingId) {
-        return buildingRepository.findById(buildingId).map(buildingConverter::toDto);
+    public Mono<BuildingResponseDto> getBuildingById(String buildingId) {
+        return buildingRepository.findById(UUID.fromString(buildingId)).map(buildingConverter::toDto);
     }
 
     public Mono<BuildingResponseDto> createBuilding(BuildingRequestDto newBuilding) {
-        return campusRepository.findById(newBuilding.campusId())
+        return campusRepository.findById(UUID.fromString(newBuilding.campusId()))
                 .flatMap(campus -> buildingRepository.save(buildingConverter.toEntity(newBuilding))
                         .map(buildingConverter::toDto));
     }
 
-    public Mono<Void> deleteBuilding(long buildingId) {
-        return buildingRepository.findById(buildingId).flatMap(buildingRepository::delete);
+    public Mono<Void> deleteBuilding(String buildingId) {
+        return buildingRepository.findById(UUID.fromString(buildingId)).flatMap(buildingRepository::delete);
     }
 
-    public Mono<BuildingResponseDto> updateBuilding(Long buildingId, BuildingRequestDto building) {
-        return buildingRepository.findById(buildingId)
+    public Mono<BuildingResponseDto> updateBuilding(String buildingId, BuildingRequestDto building) {
+        return buildingRepository.findById(UUID.fromString(buildingId))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Building not found")))
                 .flatMap(oldBuilding -> {
-                    Long campusId = building.campusId();
+                    String campusId = building.campusId();
 
                     if (!campusId.equals(oldBuilding.getCampusId())) {
                         // Se il campus è cambiato, verifichiamo se esiste
-                        return campusRepository.findById(campusId)
+                        return campusRepository.findById(UUID.fromString(campusId))
                                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campus not found")))
-                                .flatMap(campus -> buildingRepository.save(buildingConverter.toEntity(buildingId, building))
+                                .flatMap(campus -> buildingRepository.save(buildingConverter.toEntity(building))
                                         .map(buildingConverter::toDto)
                                         .doOnError(error -> Mono.error(
                                                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
@@ -66,7 +68,7 @@ public class BuildingService {
                     }
 
                     // Se il campus non è cambiato, aggiorniamo direttamente l'edificio
-                    return buildingRepository.save(buildingConverter.toEntity(buildingId, building))
+                    return buildingRepository.save(buildingConverter.toEntity(building))
                             .map(buildingConverter::toDto)
                             .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save building")));
                 });

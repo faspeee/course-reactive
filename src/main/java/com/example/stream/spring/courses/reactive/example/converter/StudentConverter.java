@@ -18,22 +18,15 @@ public class StudentConverter implements Converter<StudentRequestDto, StudentRes
      */
     @Override
     public StudentResponseDto toDto(Student student) {
-        return new StudentResponseDto(student.getName(), student.getSurname(), student.getEmail());
+        return new StudentResponseDto(student.getId().toString(), student.getName(), student.getSurname(), student.getEmail());
     }
 
-    /**
-     * @param dto
-     * @return
-     */
     @Override
     public Student toEntity(StudentRequestDto dto) {
-        return null;
-    }
-
-    @Override
-    public Student toEntity(Long id, StudentRequestDto dto) {
-        Student student = toEntity(dto);
-        student.setId(id);
+        Student student = new Student();
+        student.setName(dto.name());
+        student.setSurname(dto.surname());
+        student.setEmail(dto.email());
         return student;
     }
 

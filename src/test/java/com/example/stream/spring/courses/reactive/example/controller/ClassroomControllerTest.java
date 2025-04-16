@@ -17,7 +17,7 @@ class ClassroomControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private static ClassroomRequestDto createClassroomDto(Long buildingId, String roomNumber, Integer capacity, String identifier) {
+    private static ClassroomRequestDto createClassroomDto(String buildingId, String roomNumber, Integer capacity, String identifier) {
         return new ClassroomRequestDto(buildingId, roomNumber, capacity, identifier);
     }
 
@@ -50,7 +50,7 @@ class ClassroomControllerTest {
 
     @Test
     void add_classroom_test() {
-        ClassroomRequestDto newClassroom = createClassroomDto(1L, "XVI", 10, "id");
+        ClassroomRequestDto newClassroom = createClassroomDto("1L", "XVI", 10, "id");
         // Set other properties as needed
 
         webTestClient.post().uri("/classroom/addClassroom")
@@ -70,7 +70,7 @@ class ClassroomControllerTest {
     @DisplayName("add classroom on building that not exist return error")
     @Test
     void add_classroom_error_test() {
-        ClassroomRequestDto newClassroom = createClassroomDto(11111L, "XVI", 10, "id2");
+        ClassroomRequestDto newClassroom = createClassroomDto("11111L", "XVI", 10, "id2");
         // Set other properties as needed
 
         webTestClient.post().uri("/classroom/addClassroom")
@@ -93,7 +93,7 @@ class ClassroomControllerTest {
     @Test
     void update_classroom_test() {
         long classroomId = 1;
-        ClassroomRequestDto existingClassroom = createClassroomDto(1L, "XVIII", 10, "id3");
+        ClassroomRequestDto existingClassroom = createClassroomDto("1L", "XVIII", 10, "id3");
 
         // Set other properties as needed
 

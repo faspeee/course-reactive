@@ -4,6 +4,7 @@ import com.example.stream.spring.courses.reactive.example.model.request.CourseRe
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
 import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class CourseController {
     }
 
     @GetMapping("/getCourse")
-    public Mono<CourseResponseDto> getCourse(@RequestParam long courseId) {
+    public Mono<CourseResponseDto> getCourse(@RequestParam String courseId) {
         return courseService.getCourse(courseId);
     }
 
@@ -37,17 +38,19 @@ public class CourseController {
     }
 
     @DeleteMapping("/deleteCourse")
-    public Mono<Void> deleteCourse(@RequestParam long courseId) {
+    public Mono<Void> deleteCourse(@RequestParam String courseId) {
         return courseService.delete(courseId);
     }
 
     @PutMapping("/updateCourse")
-    public Mono<CourseResponseDto> updateCourse(@RequestBody CourseRequestDto courseDto) {
-        return courseService.updateCourse(courseDto);
+    public Mono<CourseResponseDto> updateCourse(
+            @Parameter(description = "ID of the course to be updated") @RequestParam String courseId,
+            @RequestBody CourseRequestDto courseDto) {
+        return courseService.updateCourse(courseId, courseDto);
     }
 
     @GetMapping("/{courseId}/students")
-    public Flux<StudentResponseDto> getStudentsByCourse(@PathVariable Long courseId) {
+    public Flux<StudentResponseDto> getStudentsByCourse(@PathVariable String courseId) {
         return courseService.getStudentsByCourseId(courseId);
     }
 }

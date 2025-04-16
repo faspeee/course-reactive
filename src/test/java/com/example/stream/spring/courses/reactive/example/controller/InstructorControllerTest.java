@@ -30,8 +30,8 @@ class InstructorControllerTest {
     @Test
     void testGetStudentsByTeacher() {
         Long teacherId = 1L;
-        StudentResponseDto student1 = new StudentResponseDto(1L, "Alice", "Nel paese", "alice@example.com");
-        StudentResponseDto student2 = new StudentResponseDto(2L, "Bob", "Patigno", "bob@example.com");
+        StudentResponseDto student1 = new StudentResponseDto("1L", "Alice", "Nel paese", "alice@example.com");
+        StudentResponseDto student2 = new StudentResponseDto("2L", "Bob", "Patigno", "bob@example.com");
 
         webTestClient.get()
                 .uri("/teachers/{teacherId}/students", teacherId)

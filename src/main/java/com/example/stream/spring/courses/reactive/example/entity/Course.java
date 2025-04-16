@@ -15,6 +15,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -24,7 +25,7 @@ import java.util.List;
 public class Course {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @NotBlank
     @Size(max = 100)
@@ -50,20 +51,20 @@ public class Course {
     private String description;
 
     @Column("instructor_id")
-    private Long instructorId;
+    private UUID instructorId;
 
     @Column("is_active")
     private boolean isActive = true;
 
     @NotNull
     @Column("department_id")
-    private Long departmentId;
+    private UUID departmentId;
 
     @Transient
-    private List<Long> studentIds;  // Loaded separately in service
+    private List<UUID> studentIds;  // Loaded separately in service
 
     @Transient
-    private List<Long> prerequisiteIds; // Loaded separately in service
+    private List<UUID> prerequisiteIds; // Loaded separately in service
 
     @Transient
     private String identifier;

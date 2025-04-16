@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class ClassroomService {
     private final ClassroomRepository classroomRepository;
@@ -29,14 +31,14 @@ public class ClassroomService {
                 .map(converter::toDto);
     }
 
-    public Mono<ClassroomResponseDto> getClassroomById(Long classroomId) {
-        return classroomRepository.findById(classroomId)
+    public Mono<ClassroomResponseDto> getClassroomById(String classroomId) {
+        return classroomRepository.findById(UUID.fromString(classroomId))
                 .map(converter::toDto)
                 .switchIfEmpty(Mono.empty()); // Returns empty Mono if not found
     }
 
     public Mono<ClassroomResponseDto> addClassroom(ClassroomRequestDto classroomRequestDto) {
-        return buildingRepository.findById(classroomRequestDto.buildingId())
+        return buildingRepository.findById(UUID.fromString(classroomRequestDto.buildingId()))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Campus not found")))
                 .flatMap(building -> {
                     Classroom classroom = converter.toEntity(classroomRequestDto);
@@ -46,11 +48,11 @@ public class ClassroomService {
 
     }
 
-    public Mono<ClassroomResponseDto> updateClassroom(Long classroomId, ClassroomRequestDto classroomRequestDto) {
-        return buildingRepository.findById(classroomRequestDto.buildingId())
+    public Mono<ClassroomResponseDto> updateClassroom(String classroomId, ClassroomRequestDto classroomRequestDto) {
+        return buildingRepository.findById(UUID.fromString(classroomRequestDto.buildingId()))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "classroom not found")))
                 .flatMap(building ->
-                        classroomRepository.findById(classroomId)
+                        classroomRepository.findById(UUID.fromString(classroomId))
                                 .flatMap(existingClassroom -> classroomRepository
                                         .save(converter.toEntity(classroomRequestDto)))
                                 .map(converter::toDto)
@@ -58,8 +60,8 @@ public class ClassroomService {
                 );
     }
 
-    public Mono<Void> deleteClassroom(Long classroomId) {
-        return classroomRepository.findById(classroomId)
+    public Mono<Void> deleteClassroom(String classroomId) {
+        return classroomRepository.findById(UUID.fromString(classroomId))
                 .switchIfEmpty(Mono.empty()) // Completes without emitting if not found
                 .flatMap(classroomRepository::delete);
     }

@@ -5,13 +5,15 @@ import com.example.stream.spring.courses.reactive.example.model.request.CourseRe
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class CourseConverter implements Converter<CourseRequestDto, CourseResponseDto, Course> {
     @Override
     public CourseResponseDto toDto(Course entity) {
-        return new CourseResponseDto(entity.getCourseName(), entity.getCourseCode(),
-                entity.getStartDate(), entity.getEndDate(), entity.getCreditHours(),
-                entity.getDepartmentId(), entity.getIdentifier());
+        return new CourseResponseDto(entity.getId().toString(), entity.getCourseName(), entity.getCourseCode(),
+                entity.getStartDate(), entity.getEndDate(), entity.getCreditHours(), entity.getDepartmentId().toString(),
+                entity.getIdentifier());
     }
 
     @Override
@@ -23,14 +25,8 @@ public class CourseConverter implements Converter<CourseRequestDto, CourseRespon
         // fixme
         //course.setStartDate(dto.);
         //course.setEndDate(dto.endDate());
-        course.setDepartmentId(dto.departmentId());
+        course.setDepartmentId(UUID.fromString(dto.departmentId()));
         return course;
     }
 
-    @Override
-    public Course toEntity(Long id, CourseRequestDto dto) {
-        Course course = toEntity(dto);
-        course.setId(id);
-        return course;
-    }
 }

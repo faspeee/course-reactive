@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 public class CourseService {
     private final CourseRepository courseRepository;
@@ -35,8 +37,8 @@ public class CourseService {
      * @param courseId the ID of the course
      * @return a Flux stream of Student objects
      */
-    public Flux<StudentResponseDto> getStudentsByCourseId(Long courseId) {
-        return enrollmentRepository.findByCourseId(courseId)
+    public Flux<StudentResponseDto> getStudentsByCourseId(String courseId) {
+        return enrollmentRepository.findByCourseId(UUID.fromString(courseId))
                 .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId())
                         .map(studentConverter::toDto));
     }
@@ -51,18 +53,18 @@ public class CourseService {
                 .map(converter::toDto);
     }
 
-    public Mono<CourseResponseDto> updateCourse(CourseRequestDto courseDto) {
+    public Mono<CourseResponseDto> updateCourse(String courseId, CourseRequestDto courseDto) {
         // fixme Amigo Fabi mi sa che questo aggiunge non modifica, manca l'id in courseRequest
         return courseRepository.save(converter.toEntity(courseDto))
                 .map(converter::toDto);
     }
 
-    public Mono<Void> delete(long idCourse) {
-        return courseRepository.deleteById(idCourse);
+    public Mono<Void> delete(String idCourse) {
+        return courseRepository.deleteById(UUID.fromString(idCourse));
     }
 
-    public Mono<CourseResponseDto> getCourse(long courseId) {
-        return courseRepository.findById(courseId)
+    public Mono<CourseResponseDto> getCourse(String courseId) {
+        return courseRepository.findById(UUID.fromString(courseId))
                 .map(converter::toDto);
     }
 }

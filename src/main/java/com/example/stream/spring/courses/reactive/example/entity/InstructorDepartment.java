@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,12 +18,12 @@ import org.springframework.data.relational.core.mapping.Table;
 public class InstructorDepartment {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @Column("instructor_id")
-    private Long instructorId;
+    private UUID instructorId;
 
     @Column("department_id")
-    private Long departmentId;
+    private UUID departmentId;
 
 }

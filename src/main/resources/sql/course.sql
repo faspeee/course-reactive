@@ -77,7 +77,7 @@ CREATE TABLE course_prerequisite
     FOREIGN KEY (course_id) REFERENCES course (id),
     FOREIGN KEY (prerequisite_id) REFERENCES course (id)
 );
--- University Table
+-- UniversityService Table
 CREATE TABLE university
 (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -92,9 +92,9 @@ CREATE TABLE university
     website       VARCHAR(255),   -- Official website URL
     contact_email VARCHAR(100),   -- General contact email address
     phone_number  VARCHAR(20),    -- General contact phone number
-    motto         VARCHAR(255),   -- University motto or slogan
+    motto         VARCHAR(255),   -- UniversityService motto or slogan
     colors        VARCHAR(100),   -- Official university colors
-    mascot        VARCHAR(100),   -- University mascot
+    mascot        VARCHAR(100),   -- UniversityService mascot
     campus_area   DECIMAL(10, 2), -- Total campus area in acres or hectares
     num_faculties INT,            -- Number of faculties or schools within the university
     num_programs  INT,            -- Number of academic programs offered
@@ -160,7 +160,7 @@ CREATE TABLE classroom
 INSERT INTO university (name, country, city, location, established, accreditation, president, student_count, website,
                         contact_email, phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs,
                         international, ranking, created_at, updated_at, version)
-VALUES ('Springfield University', 'USA', 'Springfield', '742 Evergreen Terrace', '1950-09-15',
+VALUES ('Springfield UniversityService', 'USA', 'Springfield', '742 Evergreen Terrace', '1950-09-15',
         'Higher Learning Commission', 'Dr. Jane Smith', 15000, 'https://www.springfielduniversity.edu',
         'info@springfielduniversity.edu', '+1-555-123-4567', 'Knowledge and Wisdom',
         'Blue and Gold', 'The Fighting Squirrel', 150.75, 10, 85, TRUE, 120, CURRENT_TIMESTAMP,
@@ -168,7 +168,7 @@ VALUES ('Springfield University', 'USA', 'Springfield', '742 Evergreen Terrace',
 
 
 INSERT INTO campus (name, address, country, city, university_id, version)
-VALUES ('Main Campus', '123 University Ave, Tech City', 'Usa', 'George', 1, 1),
+VALUES ('Main Campus', '123 UniversityService Ave, Tech City', 'Usa', 'George', 1, 1),
        ('Downtown Campus', '456 City Center Blvd, Tech City', 'Italia', 'Bologna', 1, 1);
 INSERT INTO college (name, dean, university_id, version)
 VALUES ('College of Engineering', 'Dr. Alan Turing', 1, 1),

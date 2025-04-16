@@ -48,7 +48,7 @@ public class CollegeController {
     })
     @GetMapping("/getCollege")
     public Mono<CollegeResponseDto> getCollege(
-            @Parameter(description = "ID of the college to be retrieved") @RequestParam long collegeId) {
+            @Parameter(description = "ID of the college to be retrieved") @RequestParam String collegeId) {
         return collegeService.getCollege(collegeId)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "College not found")));
     }
@@ -96,8 +96,9 @@ public class CollegeController {
     })
     @PutMapping("/updateCollege")
     public Mono<CollegeResponseDto> updateCollegeDto(
+            @Parameter(description = "ID of the college to be updated") @RequestParam String collegeId,
             @Parameter(description = "Updated college details") @RequestBody CollegeRequestDto collegeRequestDto) {
-        return collegeService.updateCollegeDto(collegeRequestDto);
+        return collegeService.updateCollegeDto(collegeId, collegeRequestDto);
     }
 
     /**
@@ -113,7 +114,7 @@ public class CollegeController {
     })
     @DeleteMapping("/deleteCollege")
     public ResponseEntity<Mono<Void>> deleteCollegeDto(
-            @Parameter(description = "ID of the college to be deleted") @RequestParam long collegeId) {
+            @Parameter(description = "ID of the college to be deleted") @RequestParam String collegeId) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(collegeService.deleteCollegeDto(collegeId));
     }
