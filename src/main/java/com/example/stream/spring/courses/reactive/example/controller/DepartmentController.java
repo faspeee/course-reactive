@@ -39,6 +39,7 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/deleteDepartment")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteDepartment(@RequestParam String departmentId) {
         return departmentService.deleteDepartment(departmentId);
     }

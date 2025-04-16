@@ -73,6 +73,7 @@ public class InstructorController {
     }
 
     @DeleteMapping("/deleteInstructor")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteInstructor(@RequestParam String instructorId) {
         return instructorService.deleteInstructor(instructorId);
     }

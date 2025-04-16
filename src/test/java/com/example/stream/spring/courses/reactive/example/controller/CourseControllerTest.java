@@ -143,7 +143,7 @@ class CourseControllerTest {
 
     @Test
     void test_get_students_by_course() {
-        String courseId = "7e73ad23-266d-4746-b948-1f78e722cf02"; // Replace with a valid course ID
+        String courseId = "7475417a-f970-4366-aa9f-55c7bb66fe0a"; // Replace with a valid course ID
         webTestClient.get().uri("/courses/{courseId}/students", courseId)
                 .exchange()
                 .expectStatus().isOk()

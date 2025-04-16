@@ -99,8 +99,8 @@ CREATE TABLE IF NOT EXISTS instructor_department
     instructor_id UUID NOT NULL,
     department_id UUID NOT NULL,
     PRIMARY KEY (instructor_id, department_id),
-    FOREIGN KEY (instructor_id) REFERENCES instructor (id),
-    FOREIGN KEY (department_id) REFERENCES department (id)
+    FOREIGN KEY (instructor_id) REFERENCES instructor (id) ON DELETE CASCADE,
+    FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE CASCADE
 );
 
 --changeset aspeeencinaf:9
@@ -116,8 +116,8 @@ CREATE TABLE IF NOT EXISTS course
     instructor_id UUID, -- Now linked to the instructor table
     is_active     BOOLEAN          DEFAULT TRUE,
     department_id UUID NOT NULL,
-    FOREIGN KEY (instructor_id) REFERENCES instructor (id),
-    FOREIGN KEY (department_id) REFERENCES department (id)
+    FOREIGN KEY (instructor_id) REFERENCES instructor (id) ON DELETE CASCADE,
+    FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE CASCADE
 );
 
 --changeset aspeeencinaf:10
@@ -127,8 +127,8 @@ CREATE TABLE IF NOT EXISTS enrollment
     course_id   UUID NOT NULL,
     enrolled_at TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (student_id, course_id),
-    FOREIGN KEY (student_id) REFERENCES student (id),
-    FOREIGN KEY (course_id) REFERENCES course (id)
+    FOREIGN KEY (student_id) REFERENCES student (id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES course (id) ON DELETE CASCADE
 );
 
 --changeset aspeeencinaf:11
@@ -137,8 +137,8 @@ CREATE TABLE IF NOT EXISTS course_prerequisite
     course_id       UUID NOT NULL,
     prerequisite_id UUID NOT NULL,
     PRIMARY KEY (course_id, prerequisite_id),
-    FOREIGN KEY (course_id) REFERENCES course (id),
-    FOREIGN KEY (prerequisite_id) REFERENCES course (id)
+    FOREIGN KEY (course_id) REFERENCES course (id) ON DELETE CASCADE,
+    FOREIGN KEY (prerequisite_id) REFERENCES course (id) ON DELETE CASCADE
 );
 
 -- UniversityService Table
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS campus
     created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT,
-    FOREIGN KEY (university_id) REFERENCES university (id)
+    FOREIGN KEY (university_id) REFERENCES university (id) ON DELETE CASCADE
 );
 --changeset aspeeencinaf:15 splitStatements:false
 CREATE OR REPLACE FUNCTION set_updated_at()
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS college
     created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT,
-    FOREIGN KEY (university_id) REFERENCES university (id)
+    FOREIGN KEY (university_id) REFERENCES university (id) ON DELETE CASCADE
 );
 
 --changeset aspeeencinaf:17 splitStatements:false

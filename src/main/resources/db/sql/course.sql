@@ -19,3 +19,10 @@ VALUES ('7475417a-f970-4366-aa9f-54c7bb66fe0a', 'General Biology', 'BIO101', '20
         'Introduction to biological principles and concepts.', '705ac9e9-f37a-4d13-9a93-e933346c2e7f', TRUE,
         '1a6c2f08-8ee8-438f-b37f-01a1c862efe7');
 
+--This course is for enrollment query
+--changeset aspeeencinaf:46
+INSERT INTO course (id, course_name, course_code, start_date, end_date, credit_hours, description, instructor_id,
+                    is_active, department_id)
+VALUES ('7475417a-f970-4366-aa9f-55c7bb66fe0a', 'General Biology', 'BIO101', '2025-09-01', '2025-12-15', 3,
+        'Introduction to biological principles and concepts.', '705ac9e9-f37a-4d13-9a93-e933346c2e7f', TRUE,
+        '1a6c2f08-8ee8-438f-b37f-01a1c862efe7');
