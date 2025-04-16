@@ -4,6 +4,8 @@ import com.example.stream.spring.courses.reactive.example.converter.StudentConve
 import com.example.stream.spring.courses.reactive.example.entity.Student;
 import com.example.stream.spring.courses.reactive.example.model.request.StudentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
+import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
+import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,14 @@ import java.util.UUID;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final StudentConverter studentConverter;
+    private final EnrollmentRepository enrollmentRepository;
+    private final CourseRepository courseRepository;
 
-    public StudentService(StudentRepository studentRepository, StudentConverter studentConverter) {
+    public StudentService(StudentRepository studentRepository, StudentConverter studentConverter, EnrollmentRepository enrollmentRepository, CourseRepository courseRepository) {
         this.studentRepository = studentRepository;
         this.studentConverter = studentConverter;
+        this.enrollmentRepository = enrollmentRepository;
+        this.courseRepository = courseRepository;
     }
 
     public Flux<StudentResponseDto> getAllStudents() {
@@ -55,4 +61,31 @@ public class StudentService {
     public Mono<Void> deleteStudent(String studentId) {
         return studentRepository.deleteById(UUID.fromString(studentId));
     }
+
+    /**
+     * Retrieves all students associated with the given courseId.
+     *
+     * @param courseId the ID of the course
+     * @return a Flux stream of Student objects
+     */
+    public Flux<StudentResponseDto> getStudentsByCourseId(String courseId) {
+        return enrollmentRepository.findByCourseId(UUID.fromString(courseId))
+                .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId())
+                        .map(studentConverter::toDto));
+    }
+
+    /**
+     * Retrieves all students associated with a specific teacher.
+     *
+     * @param teacherId the ID of the teacher
+     * @return a Flux containing StudentDTOs of the associated students
+     */
+    public Flux<StudentResponseDto> getStudentsByTeacherId(String teacherId) {
+        return courseRepository.findByInstructorId(UUID.fromString(teacherId))
+                .flatMap(course -> enrollmentRepository.findByCourseId(course.getId()))
+                .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId()))
+                .map(studentConverter::toDto)
+                .distinct();
+    }
+
 }

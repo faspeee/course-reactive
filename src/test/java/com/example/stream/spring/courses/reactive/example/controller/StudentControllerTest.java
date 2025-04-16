@@ -111,4 +111,30 @@ class StudentControllerTest {
                 });
     }
 
+    @Test
+    void test_get_students_by_course() {
+        String courseId = "7475417a-f970-4366-aa9f-55c7bb66fe0a"; // Replace with a valid course ID
+        webTestClient.get().uri("/student/{courseId}/studentsByCourse", courseId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(StudentResponseDto.class)
+                .hasSize(5); // Adjust based on expected data
+    }
+
+    /**
+     * Tests the retrieval of students by teacher ID.
+     */
+    @Test
+    void testGetStudentsByTeacher() {
+        String teacherId = "520ee975-1224-42e6-8255-a9712e2bc22c";
+        StudentResponseDto student1 = new StudentResponseDto("1eb7de5d-746c-493b-865e-b524d7e65d49", "Alice", "Williams", "alice.williams@student.globaltech.edu");
+        webTestClient.get()
+                .uri("/student/{teacherId}/studentsByTeacher", teacherId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(StudentResponseDto.class)
+                .hasSize(1)
+                .contains(student1);
+    }
 }

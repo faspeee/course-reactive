@@ -4,6 +4,7 @@ import com.example.stream.spring.courses.reactive.example.converter.DepartmentCo
 import com.example.stream.spring.courses.reactive.example.entity.Department;
 import com.example.stream.spring.courses.reactive.example.model.request.DepartmentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.DepartmentResponseDto;
+import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
 import com.example.stream.spring.courses.reactive.example.repository.DepartmentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class DepartmentService {
     private final DepartmentRepository departmentRepository;
     private final DepartmentConverter departmentConverter;
 
-    public DepartmentService(DepartmentRepository departmentRepository, DepartmentConverter departmentConverter) {
+    public DepartmentService(DepartmentRepository departmentRepository, DepartmentConverter departmentConverter, CourseRepository courseRepository) {
         this.departmentRepository = departmentRepository;
         this.departmentConverter = departmentConverter;
     }
@@ -61,4 +62,5 @@ public class DepartmentService {
     public Mono<Void> deleteDepartment(String departmentId) {
         return departmentRepository.deleteById(UUID.fromString(departmentId));
     }
+
 }
