@@ -38,6 +38,7 @@ public class UniversityConverter implements Converter<UniversityRequestDto, Univ
         entity.setPresident(dto.president());
         entity.setStudentCount(dto.studentCount());
         entity.setWebsite(dto.website());
+        entity.setLocation(dto.location());
         return entity;
     }
 }

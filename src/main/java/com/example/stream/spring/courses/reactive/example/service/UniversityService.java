@@ -69,7 +69,7 @@ public class UniversityService {
     public Mono<UniversityResponseDto> updateUniversity(String universityId, UniversityRequestDto universityRequestDto) {
         return getUniversityById(UUID.fromString(universityId))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "university not found")))
-                .flatMap(university -> universityRepository.save(university)
+                .flatMap(university -> universityRepository.save(updateUniversity(university, universityRequestDto))
                         .map(universityConverter::toDto));
     }
 
