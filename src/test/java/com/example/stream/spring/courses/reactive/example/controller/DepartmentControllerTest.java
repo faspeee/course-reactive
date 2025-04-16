@@ -34,8 +34,8 @@ class DepartmentControllerTest {
 
     @Test
     void get_department_test() {
-        long departmentId = 1; // Replace with a valid course ID
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/department/getDepartment")
+        String departmentId = "88af4487-6120-4a7f-81fe-a9ebc1072413"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/department/getDepartmentById")
                         .queryParam("deparmentId", departmentId)
                         .build())
                 .exchange()
@@ -46,6 +46,16 @@ class DepartmentControllerTest {
                     DepartmentResponseDto course = response.getResponseBody();
                     assertNotNull(course);
                 });
+    }
+
+    @Test
+    void get_department_error_test() {
+        long departmentId = 1; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/department/getDepartmentById")
+                        .queryParam("deparmentId", departmentId)
+                        .build())
+                .exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test
