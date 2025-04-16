@@ -27,6 +27,7 @@ public class StudentConverter implements Converter<StudentRequestDto, StudentRes
         student.setName(dto.name());
         student.setSurname(dto.surname());
         student.setEmail(dto.email());
+        student.setFreshman(dto.freshman());
         return student;
     }
 

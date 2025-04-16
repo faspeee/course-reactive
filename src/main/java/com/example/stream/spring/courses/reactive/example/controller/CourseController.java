@@ -39,6 +39,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/deleteCourse")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteCourse(@RequestParam String courseId) {
         return courseService.delete(courseId);
     }

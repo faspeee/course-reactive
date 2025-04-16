@@ -33,7 +33,7 @@ public class Student {
 
     @NotBlank
     @Size(min = 3, max = 100)
-    @Column("name")
+    @Column("surname")
     private String surname;
 
     @Email
