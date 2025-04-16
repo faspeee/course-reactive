@@ -141,10 +141,11 @@ class CourseControllerTest {
                 });
     }
 
+
     @Test
-    void test_get_students_by_course() {
-        String courseId = "7475417a-f970-4366-aa9f-55c7bb66fe0a"; // Replace with a valid course ID
-        webTestClient.get().uri("/courses/{courseId}/students", courseId)
+    void get_course_by_department_test() {
+        String departmentId = "19902a0f-e444-4118-9fe0-d5d61e3750dc"; // Replace with a valid course ID
+        webTestClient.get().uri("/courses/{departmentId}/course", departmentId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)

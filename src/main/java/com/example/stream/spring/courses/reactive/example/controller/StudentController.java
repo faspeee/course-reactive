@@ -3,7 +3,10 @@ package com.example.stream.spring.courses.reactive.example.controller;
 import com.example.stream.spring.courses.reactive.example.model.request.StudentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.service.StudentService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,4 +63,27 @@ public class StudentController {
     }
 
 
+    @GetMapping("/{courseId}/studentsByCourse")
+    public Flux<StudentResponseDto> getStudentsByCourse(@PathVariable String courseId) {
+        return studentService.getStudentsByCourseId(courseId);
+    }
+
+    /**
+     * Retrieves all students associated with a specific teacher.
+     *
+     * @param teacherId the ID of the teacher
+     * @return a Flux containing StudentDTOs of the associated students
+     */
+    @Operation(
+            summary = "Get Students by Teacher ID",
+            description = "Retrieves all students associated with the specified teacher ID."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of students"),
+            @ApiResponse(responseCode = "404", description = "Teacher not found")
+    })
+    @GetMapping("/{teacherId}/studentsByTeacher")
+    public Flux<StudentResponseDto> getStudentsByTeacher(@PathVariable String teacherId) {
+        return studentService.getStudentsByTeacherId(teacherId);
+    }
 }

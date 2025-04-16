@@ -2,7 +2,6 @@ package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.request.DepartmentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.DepartmentResponseDto;
-import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +35,7 @@ class DepartmentControllerTest {
     void get_department_test() {
         String departmentId = "88af4487-6120-4a7f-81fe-a9ebc1072413"; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/department/getDepartmentById")
-                        .queryParam("deparmentId", departmentId)
+                        .queryParam("departmentId", departmentId)
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -123,15 +122,5 @@ class DepartmentControllerTest {
                 });
     }
 
-    @Test
-    void get_course_by_department_test() {
-        String departmentId = "19902a0f-e444-4118-9fe0-d5d61e3750dc"; // Replace with a valid course ID
-        webTestClient.get().uri("/department/{departmentId}/course", departmentId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(StudentResponseDto.class)
-                .hasSize(5); // Adjust based on expected data
-    }
 
 }

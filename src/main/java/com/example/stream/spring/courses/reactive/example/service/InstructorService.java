@@ -1,15 +1,10 @@
 package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.InstructorConverter;
-import com.example.stream.spring.courses.reactive.example.converter.StudentConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Instructor;
 import com.example.stream.spring.courses.reactive.example.model.request.InstructorRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.InstructorResponseDto;
-import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
-import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
-import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.InstructorRepository;
-import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,45 +22,15 @@ import java.util.UUID;
 @Service
 public class InstructorService {
 
-    private final CourseRepository courseRepository;
-    private final EnrollmentRepository enrollmentRepository;
-    private final StudentRepository studentRepository;
-    private final StudentConverter studentConverter;
     private final InstructorRepository instructorRepository;
     private final InstructorConverter instructorConverter;
 
     /**
      * Constructs a TeacherService with the specified repositories and converter.
-     *
-     * @param courseRepository     the repository for course data
-     * @param enrollmentRepository the repository for enrollment data
-     * @param studentRepository    the repository for student data
-     * @param studentConverter     the converter for transforming Student entities to DTOs
      */
-    public InstructorService(CourseRepository courseRepository,
-                             EnrollmentRepository enrollmentRepository,
-                             StudentRepository studentRepository,
-                             StudentConverter studentConverter, InstructorRepository instructorRepository, InstructorConverter instructorConverter) {
-        this.courseRepository = courseRepository;
-        this.enrollmentRepository = enrollmentRepository;
-        this.studentRepository = studentRepository;
-        this.studentConverter = studentConverter;
+    public InstructorService(InstructorRepository instructorRepository, InstructorConverter instructorConverter) {
         this.instructorRepository = instructorRepository;
         this.instructorConverter = instructorConverter;
-    }
-
-    /**
-     * Retrieves all students associated with a specific teacher.
-     *
-     * @param teacherId the ID of the teacher
-     * @return a Flux containing StudentDTOs of the associated students
-     */
-    public Flux<StudentResponseDto> getStudentsByTeacherId(String teacherId) {
-        return courseRepository.findByInstructorId(UUID.fromString(teacherId))
-                .flatMap(course -> enrollmentRepository.findByCourseId(course.getId()))
-                .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId()))
-                .map(studentConverter::toDto)
-                .distinct();
     }
 
     /**
@@ -159,6 +124,10 @@ public class InstructorService {
      * or the deletion operation fails.
      */
     public Mono<Void> deleteInstructor(String instructorId) {
-        return instructorRepository.deleteById(UUID.fromString(instructorId));
+        return instructorRepository.existsById(UUID.fromString(instructorId))
+                .filter(isPresent -> isPresent)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found")))
+                .flatMap(present -> instructorRepository.deleteById(UUID.fromString(instructorId)));
+
     }
 }

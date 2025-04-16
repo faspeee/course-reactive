@@ -10,5 +10,7 @@ import java.util.UUID;
 public interface CourseRepository extends ReactiveCrudRepository<Course, UUID> {
     Flux<Course> findByInstructorId(UUID teacherId);
 
+    Flux<Course> findByDepartmentId(UUID departmentId);
+
 }
 

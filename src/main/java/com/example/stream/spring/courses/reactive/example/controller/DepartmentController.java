@@ -26,7 +26,7 @@ public class DepartmentController {
     public Mono<DepartmentResponseDto> getDepartmentById(@RequestParam String departmentId) {
         return departmentService.getDepartmentById(departmentId);
     }
-
+    
     @PostMapping("/addDepartment")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<DepartmentResponseDto> addDepartment(@RequestBody DepartmentRequestDto departmentRequestDto) {

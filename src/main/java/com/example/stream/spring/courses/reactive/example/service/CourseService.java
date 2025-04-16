@@ -1,15 +1,11 @@
 package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CourseConverter;
-import com.example.stream.spring.courses.reactive.example.converter.StudentConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Course;
 import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
-import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
 import com.example.stream.spring.courses.reactive.example.repository.DepartmentRepository;
-import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
-import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,18 +18,11 @@ import java.util.UUID;
 public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseConverter converter;
-    private final StudentConverter studentConverter;
-    private final StudentRepository studentRepository;
-    private final EnrollmentRepository enrollmentRepository;
     private final DepartmentRepository departmentRepository;
 
-    public CourseService(CourseRepository courseRepository, CourseConverter converter, StudentConverter studentConverter,
-                         StudentRepository studentRepository, EnrollmentRepository enrollmentRepository, DepartmentRepository departmentRepository) {
+    public CourseService(CourseRepository courseRepository, CourseConverter converter, DepartmentRepository departmentRepository) {
         this.courseRepository = courseRepository;
         this.converter = converter;
-        this.studentConverter = studentConverter;
-        this.studentRepository = studentRepository;
-        this.enrollmentRepository = enrollmentRepository;
         this.departmentRepository = departmentRepository;
     }
 
@@ -46,17 +35,6 @@ public class CourseService {
         return course;
     }
 
-    /**
-     * Retrieves all students associated with the given courseId.
-     *
-     * @param courseId the ID of the course
-     * @return a Flux stream of Student objects
-     */
-    public Flux<StudentResponseDto> getStudentsByCourseId(String courseId) {
-        return enrollmentRepository.findByCourseId(UUID.fromString(courseId))
-                .flatMap(enrollment -> studentRepository.findById(enrollment.getStudentId())
-                        .map(studentConverter::toDto));
-    }
 
     public Flux<CourseResponseDto> getAllCourses() {
         return courseRepository.findAll()
@@ -95,6 +73,12 @@ public class CourseService {
     public Mono<CourseResponseDto> getCourse(String courseId) {
         return getCourseById(courseId)
                 .map(converter::toDto);
+    }
+
+    public Flux<CourseResponseDto> getCourseByDepartmentId(String departmentId) {
+        return courseRepository.findByDepartmentId(UUID.fromString(departmentId))
+                .map(converter::toDto);
+
     }
 }
 

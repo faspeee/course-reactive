@@ -2,7 +2,6 @@ package com.example.stream.spring.courses.reactive.example.controller;
 
 import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
-import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.HttpStatus;
@@ -51,8 +50,8 @@ public class CourseController {
         return courseService.updateCourse(courseId, courseDto);
     }
 
-    @GetMapping("/{courseId}/students")
-    public Flux<StudentResponseDto> getStudentsByCourse(@PathVariable String courseId) {
-        return courseService.getStudentsByCourseId(courseId);
+    @GetMapping("/{departmentId}/course")
+    public Flux<CourseResponseDto> getCourseByDepartmentId(@PathVariable String departmentId) {
+        return courseService.getCourseByDepartmentId(departmentId);
     }
 }
