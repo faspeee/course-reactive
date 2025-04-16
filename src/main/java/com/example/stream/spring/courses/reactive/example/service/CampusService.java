@@ -1,10 +1,14 @@
 package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CampusConverter;
+import com.example.stream.spring.courses.reactive.example.entity.Campus;
 import com.example.stream.spring.courses.reactive.example.model.request.CampusRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CampusResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CampusRepository;
+import com.example.stream.spring.courses.reactive.example.repository.UniversityRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +23,7 @@ public class CampusService {
 
     private final CampusRepository campusRepository;
     private final CampusConverter campusConverter;
+    private final UniversityRepository universityRepository;
 
     /**
      * Constructs a {@code CampusService} with the specified repository and converter.
@@ -26,9 +31,10 @@ public class CampusService {
      * @param campusRepository the repository for campus entities
      * @param campusConverter  the converter between entity and DTO
      */
-    public CampusService(CampusRepository campusRepository, CampusConverter campusConverter) {
+    public CampusService(CampusRepository campusRepository, CampusConverter campusConverter, UniversityRepository universityRepository) {
         this.campusRepository = campusRepository;
         this.campusConverter = campusConverter;
+        this.universityRepository = universityRepository;
     }
 
     /**
@@ -48,7 +54,7 @@ public class CampusService {
      * @return a {@link Mono} emitting the {@link CampusResponseDto} if found, or empty if not found
      */
     public Mono<CampusResponseDto> getCampus(String campusId) {
-        return campusRepository.findById(UUID.fromString(campusId))
+        return getCampusById(campusId)
                 .map(campusConverter::toDto);
     }
 
@@ -59,8 +65,11 @@ public class CampusService {
      * @return a {@link Mono} emitting the created {@link CampusResponseDto}
      */
     public Mono<CampusResponseDto> addCampus(CampusRequestDto campusRequestDto) {
-        return campusRepository.save(campusConverter.toEntity(campusRequestDto))
-                .map(campusConverter::toDto);
+        return existUniversity(campusRequestDto.universityId())
+                .filter(isPresent -> isPresent)
+                .flatMap(isPresent -> campusRepository.save(campusConverter.toEntity(campusRequestDto))
+                        .map(campusConverter::toDto))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The university is not found")));
     }
 
     /**
@@ -73,6 +82,14 @@ public class CampusService {
         return campusRepository.deleteById(UUID.fromString(campusId));
     }
 
+    private Mono<Boolean> existUniversity(String universityId) {
+        return universityRepository.existsById(UUID.fromString(universityId));
+    }
+
+    private Mono<Campus> getCampusById(String campusId) {
+        return campusRepository.findById(UUID.fromString(campusId));
+    }
+
     /**
      * Updates an existing campus with the provided request data.
      *
@@ -80,7 +97,22 @@ public class CampusService {
      * @return a {@link Mono} emitting the updated {@link CampusResponseDto}
      */
     public Mono<CampusResponseDto> updateCampus(String campusId, CampusRequestDto campusRequestDto) {
-        return campusRepository.save(campusConverter.toEntity(campusRequestDto))
-                .map(campusConverter::toDto);
+        return existUniversity(campusRequestDto.universityId())
+                .filter(isPresent -> isPresent)
+                .flatMap(isPresent -> getCampusById(campusId)
+                        .flatMap(campus -> campusRepository.save(updateCampus(campus, campusRequestDto))
+                                .map(campusConverter::toDto))
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The campus is not found"))))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The university is not found")));
+
+    }
+
+    private Campus updateCampus(Campus campus, CampusRequestDto campusRequestDto) {
+        campus.setName(campusRequestDto.name());
+        campus.setCity(campusRequestDto.city());
+        campus.setAddress(campusRequestDto.address());
+        campus.setCountry(campusRequestDto.country());
+        campus.setUniversityId(UUID.fromString(campusRequestDto.universityId()));
+        return campus;
     }
 }

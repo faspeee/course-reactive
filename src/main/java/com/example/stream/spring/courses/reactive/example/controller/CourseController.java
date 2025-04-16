@@ -31,10 +31,11 @@ public class CourseController {
     }
 
     @PostMapping("/addCourse")
-    public ResponseEntity<Mono<CourseResponseDto>> addCourse(@RequestBody CourseRequestDto courseDto) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(courseService.addCourse(courseDto));
+    public Mono<ResponseEntity<CourseResponseDto>> addCourse(@RequestBody CourseRequestDto courseDto) {
+        return courseService.addCourse(courseDto)
+                .map(courseResponseDto -> ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(courseResponseDto));
     }
 
     @DeleteMapping("/deleteCourse")

@@ -2,13 +2,17 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CourseConverter;
 import com.example.stream.spring.courses.reactive.example.converter.StudentConverter;
+import com.example.stream.spring.courses.reactive.example.entity.Course;
 import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
 import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
+import com.example.stream.spring.courses.reactive.example.repository.DepartmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.EnrollmentRepository;
 import com.example.stream.spring.courses.reactive.example.repository.StudentRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,14 +25,25 @@ public class CourseService {
     private final StudentConverter studentConverter;
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final DepartmentRepository departmentRepository;
 
     public CourseService(CourseRepository courseRepository, CourseConverter converter, StudentConverter studentConverter,
-                         StudentRepository studentRepository, EnrollmentRepository enrollmentRepository) {
+                         StudentRepository studentRepository, EnrollmentRepository enrollmentRepository, DepartmentRepository departmentRepository) {
         this.courseRepository = courseRepository;
         this.converter = converter;
         this.studentConverter = studentConverter;
         this.studentRepository = studentRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.departmentRepository = departmentRepository;
+    }
+
+    private static Course updateCourse(Course course, CourseRequestDto courseRequestDto) {
+        course.setCourseCode(courseRequestDto.courseCode());
+        course.setCourseName(courseRequestDto.courseName());
+        course.setCreditHours(courseRequestDto.creditHours());
+        course.setIdentifier(courseRequestDto.identifier());
+        course.setDepartmentId(UUID.fromString(courseRequestDto.departmentId()));
+        return course;
     }
 
     /**
@@ -49,14 +64,28 @@ public class CourseService {
     }
 
     public Mono<CourseResponseDto> addCourse(CourseRequestDto courseDto) {
-        return courseRepository.save(converter.toEntity(courseDto))
-                .map(converter::toDto);
+        return departmentRepository.findById(UUID.fromString(courseDto.departmentId()))
+                .flatMap(department -> courseRepository.save(converter.toEntity(courseDto))
+                        .map(converter::toDto))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The department is not found")));
+    }
+
+    private Mono<Course> getCourseById(String courseId) {
+        return courseRepository.findById(UUID.fromString(courseId));
+    }
+
+    private Mono<Boolean> existDepartment(String departmentId) {
+        return departmentRepository.existsById(UUID.fromString(departmentId));
     }
 
     public Mono<CourseResponseDto> updateCourse(String courseId, CourseRequestDto courseDto) {
-        // fixme Amigo Fabi mi sa che questo aggiunge non modifica, manca l'id in courseRequest
-        return courseRepository.save(converter.toEntity(courseDto))
-                .map(converter::toDto);
+        return getCourseById(courseId)
+                .flatMap(course -> existDepartment(courseDto.departmentId())
+                        .filter(departmentExists -> departmentExists)
+                        .flatMap(departmentExists -> courseRepository.save(updateCourse(course, courseDto))
+                                .map(converter::toDto)
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The department is not found")))))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The course is not found")));
     }
 
     public Mono<Void> delete(String idCourse) {
@@ -64,7 +93,7 @@ public class CourseService {
     }
 
     public Mono<CourseResponseDto> getCourse(String courseId) {
-        return courseRepository.findById(UUID.fromString(courseId))
+        return getCourseById(courseId)
                 .map(converter::toDto);
     }
 }

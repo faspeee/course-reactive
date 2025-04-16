@@ -30,7 +30,7 @@ class BuildingControllerTest {
 
     @Test
     void get_building_test() {
-        long buildingId = 2; // Replace with a valid course ID
+        String buildingId = "3ceaff23-8f6e-4557-9fc6-c294f64063d4"; // Replace with a valid course ID
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/building/getBuildingById")
                         .queryParam("buildingId", buildingId)
                         .build())
@@ -46,7 +46,7 @@ class BuildingControllerTest {
 
     @Test
     void add_building_test() {
-        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", "2L", "identifier");
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
         // Set other properties as needed
 
         webTestClient.post().uri("/building/addBuilding")
@@ -66,7 +66,7 @@ class BuildingControllerTest {
     @DisplayName("adding building in campus that not exist return error")
     @Test
     void add_building_error_test() {
-        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "ZZT911", "220L", "identifier");
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "ZZT911", "3ceaff23-8f6e-4557-9fc6-c294f64063d4", "identifier");
         // Set other properties as needed
         webTestClient.post().uri("/building/addBuilding")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -77,7 +77,7 @@ class BuildingControllerTest {
 
     @Test
     void delete_building_test() {
-        long buildingId = 1; // Replace with a valid course ID to delete
+        String buildingId = "4806db08-b4fd-49d9-b099-2b8b79d13259"; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/building/deleteBuilding")
                         .queryParam("buildingId", buildingId)
                         .build())
@@ -87,10 +87,24 @@ class BuildingControllerTest {
 
     @Test
     void update_building_test() {
-        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "1L", "identifier");
-
+        BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
         // Set other properties as needed
-        Long buildingId = 1L;
+
+        String buildingId = webTestClient.post().uri("/building/addBuilding")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newBuilding)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(BuildingResponseDto.class)
+                .consumeWith(response -> {
+                    BuildingResponseDto createBuilding = response.getResponseBody();
+                    assertNotNull(createBuilding);
+                    assertNotNull(createBuilding.createdAt());
+                    assertEquals("Carlos Filling X", createBuilding.name());
+                }).returnResult().getResponseBody().buildingId();
+        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
+        
+        // Set other properties as needed
         webTestClient.put().uri(uriBuilder -> uriBuilder.path("/building/updateBuilding")
                         .queryParam("buildingId", buildingId)
                         .build())
