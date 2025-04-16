@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <include file="db/sql/schema.sql"/>
+    <include file="db/sql/university.sql"/>
+    <include file="db/sql/campus.sql"/>
+    <include file="db/sql/college.sql"/>
+    <include file="db/sql/department.sql"/>
+    <include file="db/sql/building.sql"/>
+    <include file="db/sql/classroom.sql"/>
+    <include file="db/sql/instructor.sql"/>
+    <include file="db/sql/instructor-department.sql"/>
+    <include file="db/sql/course.sql"/>
+    <include file="db/sql/student.sql"/>
+    <include file="db/sql/enrollment.sql"/>
+    <include file="db/sql/course-prerequisite.sql"/>
+</databaseChangeLog>

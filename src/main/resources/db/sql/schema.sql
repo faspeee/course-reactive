@@ -1,5 +1,10 @@
-DROP ALL OBJECTS;
-CREATE TABLE student
+--liquibase formatted sql
+
+--changeset aspeeencinaf:1
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+--changeset aspeeencinaf:2
+CREATE TABLE IF NOT EXISTS student
 (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
@@ -11,7 +16,26 @@ CREATE TABLE student
     version    BIGINT
 );
 
-CREATE TABLE department
+
+--changeset aspeeencinaf:3 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON STUDENT
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
+--changeset aspeeencinaf:4
+CREATE TABLE IF NOT EXISTS department
 (
     id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        VARCHAR(100) NOT NULL,
@@ -23,7 +47,25 @@ CREATE TABLE department
     version     BIGINT
 );
 
-CREATE TABLE instructor
+--changeset aspeeencinaf:5 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON department
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
+--changeset aspeeencinaf:6
+CREATE TABLE IF NOT EXISTS instructor
 (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name       VARCHAR(100) NOT NULL,
@@ -33,8 +75,26 @@ CREATE TABLE instructor
     version    BIGINT
 );
 
+--changeset aspeeencinaf:7 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON instructor
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
 -- NEW INTERMEDIATE TABLE: Many-to-Many (Instructor <-> Department)
-CREATE TABLE instructor_department
+--changeset aspeeencinaf:8
+CREATE TABLE IF NOT EXISTS instructor_department
 (
     instructor_id BIGINT NOT NULL,
     department_id BIGINT NOT NULL,
@@ -43,7 +103,8 @@ CREATE TABLE instructor_department
     FOREIGN KEY (department_id) REFERENCES department (id)
 );
 
-CREATE TABLE course
+--changeset aspeeencinaf:9
+CREATE TABLE IF NOT EXISTS course
 (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     course_name   VARCHAR(100),
@@ -59,7 +120,8 @@ CREATE TABLE course
     FOREIGN KEY (department_id) REFERENCES department (id)
 );
 
-CREATE TABLE enrollment
+--changeset aspeeencinaf:10
+CREATE TABLE IF NOT EXISTS enrollment
 (
     student_id  BIGINT NOT NULL,
     course_id   BIGINT NOT NULL,
@@ -69,7 +131,8 @@ CREATE TABLE enrollment
     FOREIGN KEY (course_id) REFERENCES course (id)
 );
 
-CREATE TABLE course_prerequisite
+--changeset aspeeencinaf:11
+CREATE TABLE IF NOT EXISTS course_prerequisite
 (
     course_id       BIGINT NOT NULL,
     prerequisite_id BIGINT NOT NULL,
@@ -77,8 +140,10 @@ CREATE TABLE course_prerequisite
     FOREIGN KEY (course_id) REFERENCES course (id),
     FOREIGN KEY (prerequisite_id) REFERENCES course (id)
 );
+
 -- UniversityService Table
-CREATE TABLE university
+--changeset aspeeencinaf:12
+CREATE TABLE IF NOT EXISTS university
 (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
@@ -101,11 +166,31 @@ CREATE TABLE university
     international BOOLEAN,        -- Indicator if the university has international affiliations
     ranking       INT,            -- National or international ranking position
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT
 );
+
+
+--changeset aspeeencinaf:13 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON university
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
 -- Campus Table
-CREATE TABLE campus
+--changeset aspeeencinaf:14
+CREATE TABLE IF NOT EXISTS campus
 (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
@@ -114,105 +199,114 @@ CREATE TABLE campus
     city          VARCHAR(50)  NOT NULL,
     university_id BIGINT       NOT NULL,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT,
     FOREIGN KEY (university_id) REFERENCES university (id)
 );
+--changeset aspeeencinaf:15 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON campus
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
 
 -- College Table
-CREATE TABLE college
+--changeset aspeeencinaf:16
+CREATE TABLE IF NOT EXISTS college
 (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
     dean          VARCHAR(100),
     university_id BIGINT       NOT NULL,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     version       BIGINT,
     FOREIGN KEY (university_id) REFERENCES university (id)
 );
 
+--changeset aspeeencinaf:17 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON college
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
 -- Building Table
-CREATE TABLE building
+--changeset aspeeencinaf:18
+CREATE TABLE IF NOT EXISTS building
 (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name       VARCHAR(100)       NOT NULL,
     code       VARCHAR(10) UNIQUE NOT NULL,
     campus_id  BIGINT             NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     version    BIGINT,
     FOREIGN KEY (campus_id) REFERENCES campus (id) ON DELETE CASCADE
 );
 
+--changeset aspeeencinaf:19 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON building
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+
 -- Classroom Table
-CREATE TABLE classroom
+--changeset aspeeencinaf:20
+CREATE TABLE IF NOT EXISTS classroom
 (
     id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     building_id BIGINT      NOT NULL,
     room_number VARCHAR(10) NOT NULL,
     capacity    INT,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     version     BIGINT,
     FOREIGN KEY (building_id) REFERENCES building (id) ON DELETE CASCADE
 );
-INSERT INTO university (name, country, city, location, established, accreditation, president, student_count, website,
-                        contact_email, phone_number, motto, colors, mascot, campus_area, num_faculties, num_programs,
-                        international, ranking, created_at, updated_at, version)
-VALUES ('Springfield UniversityService', 'USA', 'Springfield', '742 Evergreen Terrace', '1950-09-15',
-        'Higher Learning Commission', 'Dr. Jane Smith', 15000, 'https://www.springfielduniversity.edu',
-        'info@springfielduniversity.edu', '+1-555-123-4567', 'Knowledge and Wisdom',
-        'Blue and Gold', 'The Fighting Squirrel', 150.75, 10, 85, TRUE, 120, CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP, 1);
+--changeset aspeeencinaf:21 splitStatements:false
+CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-
-INSERT INTO campus (name, address, country, city, university_id, version)
-VALUES ('Main Campus', '123 UniversityService Ave, Tech City', 'Usa', 'George', 1, 1),
-       ('Downtown Campus', '456 City Center Blvd, Tech City', 'Italia', 'Bologna', 1, 1);
-INSERT INTO college (name, dean, university_id, version)
-VALUES ('College of Engineering', 'Dr. Alan Turing', 1, 1),
-       ('College of Arts and Sciences', 'Dr. Marie Curie', 1, 1);
-INSERT INTO department (name, description, identifier, college_id, version)
-VALUES ('Computer Science', 'Focuses on the study of computer systems and computational processes.', 'DSUEOW823', 1, 1),
-       ('Electrical Engineering',
-        'Deals with the study and application of electricity, electronics, and electromagnetism.', 'SWPSAS83', 1, 1),
-       ('Biology', 'Explores the science of life and living organisms.', 'SWPSAS81', 2, 1);
-INSERT INTO building (name, code, campus_id, version)
-VALUES ('Engineering Hall', 'ENGH', 1, 1),
-       ('Science Building', 'SCIB', 1, 1),
-       ('Downtown Center', 'DTC', 2, 1);
-INSERT INTO classroom (building_id, room_number, capacity, version)
-VALUES (1, '101', 50, 1),
-       (1, '102', 30, 1),
-       (2, '201', 100, 1),
-       (3, '301', 40, 1);
-INSERT INTO instructor (name, email, created_at, updated_at, version)
-VALUES ('Dr. Emily Johnson', 'e.johnson@globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-       ('Dr. Michael Brown', 'm.brown@globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-       ('Dr. Sarah Davis', 's.davis@globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1);
-INSERT INTO instructor_department (instructor_id, department_id)
-VALUES (1, 1),
-       (2, 2),
-       (3, 3);
-INSERT INTO course (course_name, course_code, start_date, end_date, credit_hours, description, instructor_id, is_active,
-                    department_id)
-VALUES ('Introduction to Programming', 'CS101', '2025-09-01', '2025-12-15', 3,
-        'Basic concepts of programming using Python.', 1, TRUE, 1),
-       ('Circuit Analysis', 'EE201', '2025-09-01', '2025-12-15', 4,
-        'Study of electrical circuits and their components.', 2, TRUE, 2),
-       ('General Biology', 'BIO101', '2025-09-01', '2025-12-15', 3,
-        'Introduction to biological principles and concepts.', 3, TRUE, 3);
-INSERT INTO student (name, surname, email, created_at, updated_at, freshman, version)
-VALUES ('Alice', 'Williams', 'alice.williams@student.globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Yes', 1),
-       ('Bob', 'Miller', 'bob.miller@student.globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Yes', 1),
-       ('Charlie', 'Garcia', 'charlie.garcia@student.globaltech.edu', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Yes', 1);
-INSERT INTO enrollment (student_id, course_id, enrolled_at)
-VALUES (1, 1, CURRENT_TIMESTAMP),
-       (2, 2, CURRENT_TIMESTAMP),
-       (3, 3, CURRENT_TIMESTAMP),
-       (1, 2, CURRENT_TIMESTAMP),
-       (2, 3, CURRENT_TIMESTAMP);
-INSERT INTO course_prerequisite (course_id, prerequisite_id)
-VALUES (2, 1); -- Circuit Analysis requires Introduction to Programming as a prerequisite
+CREATE TRIGGER trg_set_updated_at
+    BEFORE UPDATE
+    ON classroom
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
 
