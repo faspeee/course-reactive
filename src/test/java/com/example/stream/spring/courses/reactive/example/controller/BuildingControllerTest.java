@@ -49,6 +49,30 @@ class BuildingControllerTest {
     }
 
     @Test
+    void get_building_not_found_test() {
+        String buildingId = "3ceaff23-8f6e-4557-9fc6-c294f64063d4"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/building/getBuildingById")
+                        .queryParam("buildingId", buildingId)
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The building not found");
+    }
+
+    @Test
+    void get_building_server_error_test() {
+        String buildingId = "3ceaff23-8f6e-4557-9fc6-c294f64063d4"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/building/getBuildingById")
+                        .queryParam("buildingId", buildingId)
+                        .build())
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The building not found");
+    }
+
+    @Test
     void add_building_test() {
         BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS191", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
         // Set other properties as needed
@@ -90,6 +114,30 @@ class BuildingControllerTest {
     }
 
     @Test
+    void delete_building_not_found_test() {
+        String buildingId = "4806db08-b4fd-49d9-b099-2b8b79d13259"; // Replace with a valid course ID to delete
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/building/deleteBuilding")
+                        .queryParam("buildingId", buildingId)
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The building not found");
+    }
+
+    @Test
+    void delete_building_server_error_test() {
+        String buildingId = "4806db08-b4fd-49d9-b099-2b8b79d13259"; // Replace with a valid course ID to delete
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/building/deleteBuilding")
+                        .queryParam("buildingId", buildingId)
+                        .build())
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The building not found");
+    }
+
+    @Test
     void update_building_test() {
         BuildingRequestDto newBuilding = createBuildingDto("Carlos Filling X", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
         // Set other properties as needed
@@ -109,12 +157,7 @@ class BuildingControllerTest {
         BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
 
         // Set other properties as needed
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path("/building/updateBuilding")
-                        .queryParam("buildingId", buildingId)
-                        .build())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(existedBuilding)
-                .exchange()
+        putBuilding(existedBuilding, buildingId)
                 .expectStatus().isOk()
                 .expectBody(BuildingResponseDto.class)
                 .consumeWith(response -> {
@@ -124,4 +167,32 @@ class BuildingControllerTest {
                 });
     }
 
+    @Test
+    void update_building_not_found_test() {
+        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
+        // Set other properties as needed
+        putBuilding(existedBuilding, "4106db08-b4fd-49d9-b099-2b8b79d13259")
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The building not found");
+    }
+
+    private WebTestClient.ResponseSpec putBuilding(BuildingRequestDto existedBuilding, String buildingId) {
+        return webTestClient.put().uri(uriBuilder -> uriBuilder.path("/building/updateBuilding")
+                        .queryParam("buildingId", buildingId)
+                        .build())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(existedBuilding)
+                .exchange();
+    }
+
+    @Test
+    void update_building_server_error_test() {
+        BuildingRequestDto existedBuilding = createBuildingDto("Carlos Filling", "XDS192", "e4b44ebc-7369-4c79-96d4-4e0c61034efc", "identifier");
+        // Set other properties as needed
+        putBuilding(existedBuilding, "12332")
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The building not found");
+    }
 }
