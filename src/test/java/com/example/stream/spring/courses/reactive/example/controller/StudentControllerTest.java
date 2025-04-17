@@ -48,6 +48,26 @@ class StudentControllerTest {
     }
 
     @Test
+    void get_student_not_found_test() {
+        String studentId = "1e17de5d-746c-493b-865e-b524d7e65d49"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/student/getStudent")
+                        .queryParam("studentId", studentId)
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void get_student_server_error_test() {
+        String studentId = "2342"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/student/getStudent")
+                        .queryParam("studentId", studentId)
+                        .build())
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
     void add_student_test() {
         StudentRequestDto newStudent = createStudentDto("Fabian", "Aspee Encina", "faspeeencina@gmail.com", "Yes");
         // Set other properties as needed
@@ -74,6 +94,26 @@ class StudentControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    void delete_student_not_found_test() {
+        String studentId = "2853e3c3-d15f-4e35-86ff-88b749183b7a"; // Replace with a valid course ID to delete
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/student/deleteStudent")
+                        .queryParam("studentId", studentId)
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void delete_student_server_error_test() {
+        String studentId = "1232"; // Replace with a valid course ID to delete
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/student/deleteStudent")
+                        .queryParam("studentId", studentId)
+                        .build())
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -122,11 +162,27 @@ class StudentControllerTest {
                 .hasSize(5); // Adjust based on expected data
     }
 
+    @Test
+    void test_get_students_by_course_not_found() {
+        String courseId = "7475412a-f970-4366-aa9f-55c7bb66fe0a"; // Replace with a valid course ID
+        webTestClient.get().uri("/student/{courseId}/studentsByCourse", courseId)
+                .exchange()
+                .expectStatus().isNotFound(); // Adjust based on expected data
+    }
+
+    @Test
+    void test_get_students_by_course_error_server() {
+        String courseId = "1232"; // Replace with a valid course ID
+        webTestClient.get().uri("/student/{courseId}/studentsByCourse", courseId)
+                .exchange()
+                .expectStatus().is5xxServerError(); // Adjust based on expected data
+    }
+
     /**
      * Tests the retrieval of students by teacher ID.
      */
     @Test
-    void testGetStudentsByTeacher() {
+    void test_get_students_by_teacher() {
         String teacherId = "520ee975-1224-42e6-8255-a9712e2bc22c";
         StudentResponseDto student1 = new StudentResponseDto("1eb7de5d-746c-493b-865e-b524d7e65d49", "Alice", "Williams", "alice.williams@student.globaltech.edu");
         webTestClient.get()
@@ -136,5 +192,23 @@ class StudentControllerTest {
                 .expectBodyList(StudentResponseDto.class)
                 .hasSize(1)
                 .contains(student1);
+    }
+
+    @Test
+    void test_get_students_by_teacher_not_found() {
+        String teacherId = "520ee975-1224-41e6-8255-a9712e2bc22c";
+        webTestClient.get()
+                .uri("/student/{teacherId}/studentsByTeacher", teacherId)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void test_get_students_by_teacher_error_server() {
+        String teacherId = "2392912";
+        webTestClient.get()
+                .uri("/student/{teacherId}/studentsByTeacher", teacherId)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 }
