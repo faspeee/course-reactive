@@ -105,7 +105,7 @@ class BuildingControllerTest {
 
     @Test
     void delete_building_test() {
-        String buildingId = "4806db08-b4fd-49d9-b099-2b8b79d13259"; // Replace with a valid course ID to delete
+        String buildingId = "199d0cb2-be34-48da-8915-9964daf6d724"; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/building/deleteBuilding")
                         .queryParam("buildingId", buildingId)
                         .build())
