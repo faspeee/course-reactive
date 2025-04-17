@@ -103,7 +103,9 @@ class StudentControllerTest {
                         .queryParam("studentId", studentId)
                         .build())
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The student is not found");
     }
 
     @Test
@@ -113,7 +115,8 @@ class StudentControllerTest {
                         .queryParam("studentId", studentId)
                         .build())
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().is5xxServerError().expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid UUID string: 1232");
     }
 
     @Test
@@ -167,7 +170,9 @@ class StudentControllerTest {
         String courseId = "7475412a-f970-4366-aa9f-55c7bb66fe0a"; // Replace with a valid course ID
         webTestClient.get().uri("/student/{courseId}/studentsByCourse", courseId)
                 .exchange()
-                .expectStatus().isNotFound(); // Adjust based on expected data
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("The course is not found"); // Adjust based on expected data
     }
 
     @Test
@@ -175,7 +180,8 @@ class StudentControllerTest {
         String courseId = "1232"; // Replace with a valid course ID
         webTestClient.get().uri("/student/{courseId}/studentsByCourse", courseId)
                 .exchange()
-                .expectStatus().is5xxServerError(); // Adjust based on expected data
+                .expectStatus().is5xxServerError().expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid UUID string: 1232"); // Adjust based on expected data
     }
 
     /**
@@ -200,7 +206,8 @@ class StudentControllerTest {
         webTestClient.get()
                 .uri("/student/{teacherId}/studentsByTeacher", teacherId)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isNotFound().expectBody()
+                .jsonPath("$.message").isEqualTo("The teacher is not found");
     }
 
     @Test
@@ -209,6 +216,8 @@ class StudentControllerTest {
         webTestClient.get()
                 .uri("/student/{teacherId}/studentsByTeacher", teacherId)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().is5xxServerError().expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid UUID string: 2392912");
+
     }
 }

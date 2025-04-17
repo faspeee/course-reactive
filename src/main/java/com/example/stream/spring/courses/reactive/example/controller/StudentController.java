@@ -6,16 +6,18 @@ import com.example.stream.spring.courses.reactive.example.service.StudentService
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/student")
+@Tag(name = "Student Management", description = "Endpoints for managing students and their relationships with courses and teachers")
 public class StudentController {
 
     private final StudentService studentService;
@@ -24,66 +26,111 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-
+    @Operation(
+            summary = "Get All Students",
+            description = "Retrieves a list of all students in the system",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of students")
+            }
+    )
     @GetMapping("/getAllStudents")
     public Flux<StudentResponseDto> findAllStudent() {
         return studentService.getAllStudents();
     }
 
+    @Operation(
+            summary = "Get Student by ID",
+            description = "Retrieves a student using the provided student ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Student found"),
+                    @ApiResponse(responseCode = "404", description = "Student not found")
+            }
+    )
     @GetMapping(value = "/getStudent", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<StudentResponseDto>> getStudent(
-            @Parameter(description = "ID of the studentId to be retrieved") @RequestParam("studentId") String studentId) {
+            @Parameter(description = "ID of the student to be retrieved") @RequestParam("studentId") String studentId) {
         return studentService.getStudentById(studentId)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The student is not found")))
+                .map(ResponseEntity::ok);
     }
 
+    @Operation(
+            summary = "Create Student",
+            description = "Adds a new student to the system using the provided student details",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Student successfully created")
+            }
+    )
     @PostMapping(value = "/addStudent", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<StudentResponseDto> addStudent(
-            @Parameter(description = "Student details for the new studentId") @RequestBody StudentRequestDto studentRequestDto) {
+            @Parameter(description = "Student details for the new student") @RequestBody StudentRequestDto studentRequestDto) {
         return studentService.createStudent(studentRequestDto);
     }
 
+    @Operation(
+            summary = "Update Student",
+            description = "Updates an existing student's information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Student successfully updated"),
+                    @ApiResponse(responseCode = "404", description = "Student not found")
+            }
+    )
     @PutMapping(value = "/updateStudent", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<StudentResponseDto>> updateStudent(
-            @Parameter(description = "Updated department details") @RequestBody StudentRequestDto studentRequestDto,
-            @RequestParam String studentId) {
+            @Parameter(description = "Updated student details") @RequestBody StudentRequestDto studentRequestDto,
+            @Parameter(description = "ID of the student to update") @RequestParam String studentId) {
         return studentService.updateStudent(studentId, studentRequestDto)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The student is not found")))
+                .map(ResponseEntity::ok);
     }
 
-
+    @Operation(
+            summary = "Delete Student",
+            description = "Deletes a student from the system based on the provided ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Student successfully deleted"),
+                    @ApiResponse(responseCode = "404", description = "student not found")
+            }
+    )
     @DeleteMapping("/deleteStudent")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteStudent(
-            @Parameter(description = "ID of the studentId to be deleted") @RequestParam("studentId") String studentId) {
-        return studentService.deleteStudent(studentId);
+            @Parameter(description = "ID of the student to be deleted") @RequestParam("studentId") String studentId) {
+        return studentService.deleteStudent(studentId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The student is not found")))
+                .flatMap(present -> Mono.empty());
+
     }
 
-
+    @Operation(
+            summary = "Get Students by Course ID",
+            description = "Fetches all students who are enrolled in the course specified by courseId",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "List of enrolled students returned"),
+                    @ApiResponse(responseCode = "404", description = "Course not found")
+            }
+    )
     @GetMapping("/{courseId}/studentsByCourse")
-    public Flux<StudentResponseDto> getStudentsByCourse(@PathVariable String courseId) {
-        return studentService.getStudentsByCourseId(courseId);
+    public Flux<StudentResponseDto> getStudentsByCourse(
+            @Parameter(description = "Course ID to fetch students for") @PathVariable String courseId) {
+        return studentService.getStudentsByCourseId(courseId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The course is not found")));
     }
 
-    /**
-     * Retrieves all students associated with a specific teacher.
-     *
-     * @param teacherId the ID of the teacher
-     * @return a Flux containing StudentDTOs of the associated students
-     */
     @Operation(
             summary = "Get Students by Teacher ID",
-            description = "Retrieves all students associated with the specified teacher ID."
+            description = "Retrieves all students associated with the specified teacher ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of students"),
+                    @ApiResponse(responseCode = "404", description = "Teacher not found")
+            }
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of students"),
-            @ApiResponse(responseCode = "404", description = "Teacher not found")
-    })
     @GetMapping("/{teacherId}/studentsByTeacher")
-    public Flux<StudentResponseDto> getStudentsByTeacher(@PathVariable String teacherId) {
-        return studentService.getStudentsByTeacherId(teacherId);
+    public Flux<StudentResponseDto> getStudentsByTeacher(
+            @Parameter(description = "Teacher ID to retrieve students for") @PathVariable String teacherId) {
+        return studentService.getStudentsByTeacherId(teacherId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The teacher is not found")));
     }
 }
+
