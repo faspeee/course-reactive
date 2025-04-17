@@ -2,6 +2,9 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.DepartmentConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Department;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.DepartmentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.DepartmentResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
@@ -29,12 +32,12 @@ public class DepartmentService {
                 .map(departmentConverter::toDto);
     }
 
-    public Mono<DepartmentResponseDto> createDepartment(DepartmentRequestDto departmentRequestDto) {
+    public Mono<Either<Error, DepartmentResponseDto>> createDepartment(DepartmentRequestDto departmentRequestDto) {
         return departmentRepository.save(departmentConverter.toEntity(departmentRequestDto))
                 .map(departmentConverter::toDto);
     }
 
-    public Mono<DepartmentResponseDto> getDepartmentById(String departmentId) {
+    public Mono<Either<Error, DepartmentResponseDto>> getDepartmentById(String departmentId) {
         return getDepartmentById(UUID.fromString(departmentId))
                 .map(departmentConverter::toDto);
     }
@@ -51,7 +54,7 @@ public class DepartmentService {
         return departmentRepository.findById(departmentId);
     }
 
-    public Mono<DepartmentResponseDto> updateDepartment(String departmentId, DepartmentRequestDto departmentRequestDto) {
+    public Mono<Either<Error, DepartmentResponseDto>> updateDepartment(String departmentId, DepartmentRequestDto departmentRequestDto) {
         return getDepartmentById(UUID.fromString(departmentId))
                 .map(department -> updateDepartment(department, departmentRequestDto))
                 .flatMap(department -> departmentRepository.save(department)
@@ -59,7 +62,7 @@ public class DepartmentService {
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "department not found")));
     }
 
-    public Mono<Void> deleteDepartment(String departmentId) {
+    public Mono<Either<Error, Success>> deleteDepartment(String departmentId) {
         return departmentRepository.deleteById(UUID.fromString(departmentId));
     }
 

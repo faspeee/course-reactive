@@ -2,6 +2,9 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.InstructorConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Instructor;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.InstructorRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.InstructorResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.InstructorRepository;
@@ -61,7 +64,7 @@ public class InstructorService {
      * @param instructorId the string representation of the instructor's {@link UUID}.
      * @return a {@link Mono} containing the {@link InstructorResponseDto} if found; otherwise an empty {@link Mono}.
      */
-    public Mono<InstructorResponseDto> getInstructorById(String instructorId) {
+    public Mono<Either<Error, InstructorResponseDto>> getInstructorById(String instructorId) {
         return getInstructorById(UUID.fromString(instructorId))
                 .map(instructorConverter::toDto);
     }
@@ -73,7 +76,7 @@ public class InstructorService {
      * @param requestDto the {@link InstructorRequestDto} containing data for the new instructor.
      * @return a {@link Mono} containing the created {@link InstructorResponseDto}.
      */
-    public Mono<InstructorResponseDto> createInstructor(InstructorRequestDto requestDto) {
+    public Mono<Either<Error, InstructorResponseDto>> createInstructor(InstructorRequestDto requestDto) {
         return instructorRepository.save(instructorConverter.toEntity(requestDto))
                 .map(instructorConverter::toDto);
     }
@@ -101,7 +104,7 @@ public class InstructorService {
      * @return a {@link Mono} containing the updated {@link InstructorResponseDto}.
      * Emits a {@link ResponseStatusException} with {@code NOT_FOUND} if the instructor does not exist.
      */
-    public Mono<InstructorResponseDto> updateInstructor(String instructorId, InstructorRequestDto requestDto) {
+    public Mono<Either<Error, InstructorResponseDto>> updateInstructor(String instructorId, InstructorRequestDto requestDto) {
         return getInstructorById(UUID.fromString(instructorId))
                 .flatMap(instructor -> instructorRepository.save(updateInstructor(instructor, requestDto))
                         .map(instructorConverter::toDto))
@@ -123,7 +126,7 @@ public class InstructorService {
      * if the ID was not found. It may also signal an error if the ID format is invalid
      * or the deletion operation fails.
      */
-    public Mono<Void> deleteInstructor(String instructorId) {
+    public Mono<Either<Error, Success>> deleteInstructor(String instructorId) {
         return instructorRepository.existsById(UUID.fromString(instructorId))
                 .filter(isPresent -> isPresent)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found")))

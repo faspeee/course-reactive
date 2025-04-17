@@ -2,6 +2,9 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.UniversityConverter;
 import com.example.stream.spring.courses.reactive.example.entity.University;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.UniversityRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.UniversityResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.UniversityRepository;
@@ -29,12 +32,12 @@ public class UniversityService {
                 .map(universityConverter::toDto);
     }
 
-    public Mono<UniversityResponseDto> findUniversityById(String universityId) {
+    public Mono<Either<Error, UniversityResponseDto>> findUniversityById(String universityId) {
         return getUniversityById(UUID.fromString(universityId))
                 .map(universityConverter::toDto);
     }
 
-    public Mono<UniversityResponseDto> createUniversity(UniversityRequestDto universityRequestDto) {
+    public Mono<Either<Error, UniversityResponseDto>> createUniversity(UniversityRequestDto universityRequestDto) {
         return universityRepository.save(universityConverter.toEntity(universityRequestDto))
                 .map(universityConverter::toDto);
     }
@@ -66,14 +69,14 @@ public class UniversityService {
         return universityRepository.findById(universityId);
     }
 
-    public Mono<UniversityResponseDto> updateUniversity(String universityId, UniversityRequestDto universityRequestDto) {
+    public Mono<Either<Error, UniversityResponseDto>> updateUniversity(String universityId, UniversityRequestDto universityRequestDto) {
         return getUniversityById(UUID.fromString(universityId))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "university not found")))
                 .flatMap(university -> universityRepository.save(updateUniversity(university, universityRequestDto))
                         .map(universityConverter::toDto));
     }
 
-    public Mono<Void> deleteUniversity(String universityId) {
+    public Mono<Either<Error, Success>> deleteUniversity(String universityId) {
         return universityRepository.deleteById(UUID.fromString(universityId));
     }
 }

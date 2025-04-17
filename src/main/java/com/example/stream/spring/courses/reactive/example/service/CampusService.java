@@ -2,6 +2,10 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CampusConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Campus;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.CampusNotFound;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.CampusRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CampusResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CampusRepository;
@@ -53,8 +57,8 @@ public class CampusService {
      * @param campusId the unique identifier of the campus
      * @return a {@link Mono} emitting the {@link CampusResponseDto} if found, or empty if not found
      */
-    public Mono<CampusResponseDto> getCampus(String campusId) {
-        return getCampusById(campusId)
+    public Mono<Either<Error, CampusResponseDto>> getCampusById(String campusId) {
+        return retrieveCampusById(campusId)
                 .map(campusConverter::toDto);
     }
 
@@ -64,12 +68,12 @@ public class CampusService {
      * @param campusRequestDto the data transfer object containing campus details
      * @return a {@link Mono} emitting the created {@link CampusResponseDto}
      */
-    public Mono<CampusResponseDto> addCampus(CampusRequestDto campusRequestDto) {
+    public Mono<Either<Error, CampusResponseDto>> addCampus(CampusRequestDto campusRequestDto) {
         return existUniversity(campusRequestDto.universityId())
                 .filter(isPresent -> isPresent)
                 .flatMap(isPresent -> campusRepository.save(campusConverter.toEntity(campusRequestDto))
-                        .map(campusConverter::toDto))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The university is not found")));
+                        .map(campus -> Either.right(campusConverter.toDto(campus))))
+                .switchIfEmpty(Mono.just(Either.left()));
     }
 
     /**
@@ -78,16 +82,21 @@ public class CampusService {
      * @param campusId the unique identifier of the campus to delete
      * @return a {@link Mono} that completes when the deletion is done
      */
-    public Mono<Void> deleteCampus(String campusId) {
+    public Mono<Either<Error, Success>> deleteCampus(String campusId) {
         return campusRepository.deleteById(UUID.fromString(campusId));
     }
 
-    private Mono<Boolean> existUniversity(String universityId) {
-        return universityRepository.existsById(UUID.fromString(universityId));
+    private Mono<Either<Error, Boolean>> existUniversity(String universityId) {
+        return universityRepository.existsById(UUID.fromString(universityId))
+                .filter(Boolean::booleanValue)
+                .map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left()));
     }
 
-    private Mono<Campus> getCampusById(String campusId) {
-        return campusRepository.findById(UUID.fromString(campusId));
+    private Mono<Either<Error, Campus>> retrieveCampusById(String campusId) {
+        return campusRepository.findById(UUID.fromString(campusId))
+                .<Either<Error, Campus>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new CampusNotFound())));
     }
 
     /**
@@ -96,10 +105,10 @@ public class CampusService {
      * @param campusRequestDto the data transfer object containing updated campus details
      * @return a {@link Mono} emitting the updated {@link CampusResponseDto}
      */
-    public Mono<CampusResponseDto> updateCampus(String campusId, CampusRequestDto campusRequestDto) {
+    public Mono<Either<Error, CampusResponseDto>> updateCampus(String campusId, CampusRequestDto campusRequestDto) {
         return existUniversity(campusRequestDto.universityId())
                 .filter(isPresent -> isPresent)
-                .flatMap(isPresent -> getCampusById(campusId)
+                .flatMap(isPresent -> retrieveCampusById(campusId)
                         .flatMap(campus -> campusRepository.save(updateCampus(campus, campusRequestDto))
                                 .map(campusConverter::toDto))
                         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The campus is not found"))))

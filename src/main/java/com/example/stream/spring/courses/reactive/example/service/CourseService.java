@@ -2,6 +2,9 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CourseConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Course;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
@@ -41,14 +44,14 @@ public class CourseService {
                 .map(converter::toDto);
     }
 
-    public Mono<CourseResponseDto> addCourse(CourseRequestDto courseDto) {
+    public Mono<Either<Error, CourseResponseDto>> addCourse(CourseRequestDto courseDto) {
         return departmentRepository.findById(UUID.fromString(courseDto.departmentId()))
                 .flatMap(department -> courseRepository.save(converter.toEntity(courseDto))
                         .map(converter::toDto))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The department is not found")));
     }
 
-    private Mono<Course> getCourseById(String courseId) {
+    private Mono<Course> retrieveCourseById(String courseId) {
         return courseRepository.findById(UUID.fromString(courseId));
     }
 
@@ -56,8 +59,8 @@ public class CourseService {
         return departmentRepository.existsById(UUID.fromString(departmentId));
     }
 
-    public Mono<CourseResponseDto> updateCourse(String courseId, CourseRequestDto courseDto) {
-        return getCourseById(courseId)
+    public Mono<Either<Error, CourseResponseDto>> updateCourse(String courseId, CourseRequestDto courseDto) {
+        return retrieveCourseById(courseId)
                 .flatMap(course -> existDepartment(courseDto.departmentId())
                         .filter(departmentExists -> departmentExists)
                         .flatMap(departmentExists -> courseRepository.save(updateCourse(course, courseDto))
@@ -66,19 +69,18 @@ public class CourseService {
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The course is not found")));
     }
 
-    public Mono<Void> delete(String idCourse) {
+    public Mono<Either<Error, Success>> deleteCourseById(String idCourse) {
         return courseRepository.deleteById(UUID.fromString(idCourse));
     }
 
-    public Mono<CourseResponseDto> getCourse(String courseId) {
-        return getCourseById(courseId)
+    public Mono<Either<Error, CourseResponseDto>> getCourseById(String courseId) {
+        return retrieveCourseById(courseId)
                 .map(converter::toDto);
     }
 
     public Flux<CourseResponseDto> getCourseByDepartmentId(String departmentId) {
         return courseRepository.findByDepartmentId(UUID.fromString(departmentId))
                 .map(converter::toDto);
-
     }
 }
 

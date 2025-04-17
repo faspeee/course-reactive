@@ -59,7 +59,7 @@ public class CampusController {
     @GetMapping("/getCampus")
     public ResponseEntity<Mono<CampusResponseDto>> getCampus(
             @Parameter(description = "ID of the campus to be retrieved") @RequestParam String campusId) {
-        return ResponseEntity.ok().body(campusService.getCampus(campusId));
+        return ResponseEntity.ok().body(campusService.getCampusById(campusId));
     }
 
     /**

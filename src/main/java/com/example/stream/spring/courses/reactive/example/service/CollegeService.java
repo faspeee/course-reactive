@@ -1,6 +1,9 @@
 package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CollegeConverter;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.CollegeRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CollegeResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CollegeRepository;
@@ -43,7 +46,7 @@ public class CollegeService {
      * @param collegeId the unique identifier of the college
      * @return a {@link Mono} emitting the {@link CollegeResponseDto} if found, or empty if not found
      */
-    public Mono<CollegeResponseDto> getCollege(String collegeId) {
+    public Mono<Either<Error, CollegeResponseDto>> getCollege(String collegeId) {
         return collegeRepository.findById(UUID.fromString(collegeId))
                 .map(converter::toDto);
     }
@@ -66,7 +69,7 @@ public class CollegeService {
      * @return a {@link Mono} emitting the created {@link CollegeResponseDto}
      * @throws ResponseStatusException if the associated university is not found
      */
-    public Mono<CollegeResponseDto> addCollegeDto(CollegeRequestDto collegeRequestDto) {
+    public Mono<Either<Error, CollegeResponseDto>> addCollegeDto(CollegeRequestDto collegeRequestDto) {
         return universityRepository.findById(UUID.fromString(collegeRequestDto.universityId()))
                 .flatMap(university -> collegeRepository.save(converter.toEntity(collegeRequestDto))
                         .map(converter::toDto))
@@ -79,7 +82,7 @@ public class CollegeService {
      * @param collegeRequestDto the data transfer object containing updated college details
      * @return a {@link Mono} emitting the updated {@link CollegeResponseDto}
      */
-    public Mono<CollegeResponseDto> updateCollegeDto(String collegeId, CollegeRequestDto collegeRequestDto) {
+    public Mono<Either<Error, CollegeResponseDto>> updateCollegeDto(String collegeId, CollegeRequestDto collegeRequestDto) {
         return collegeRepository.save(converter.toEntity(collegeRequestDto))
                 .map(converter::toDto);
     }
@@ -90,7 +93,7 @@ public class CollegeService {
      * @param collegeId the unique identifier of the college to delete
      * @return a {@link Mono} that completes when the deletion is done
      */
-    public Mono<Void> deleteCollegeDto(String collegeId) {
+    public Mono<Either<Error, Success>> deleteCollegeDto(String collegeId) {
         return collegeRepository.deleteById(UUID.fromString(collegeId));
     }
 }

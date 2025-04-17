@@ -2,6 +2,9 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.StudentConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Student;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.StudentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
@@ -74,7 +77,7 @@ public class StudentService {
      * @param studentId the unique identifier of the student
      * @return a {@link Mono} emitting the matching {@link StudentResponseDto}, if found
      */
-    public Mono<StudentResponseDto> getStudentById(String studentId) {
+    public Mono<Either<Error, StudentResponseDto>> getStudentById(String studentId) {
         return retrieveStudent(studentId)
                 .map(studentConverter::toDto);
     }
@@ -85,7 +88,7 @@ public class StudentService {
      * @param studentRequestDto the data representing the student to be created
      * @return a {@link Mono} emitting the saved student in DTO format
      */
-    public Mono<StudentResponseDto> createStudent(StudentRequestDto studentRequestDto) {
+    public Mono<Either<Error, StudentResponseDto>> createStudent(StudentRequestDto studentRequestDto) {
         return studentRepository.save(studentConverter.toEntity(studentRequestDto))
                 .map(studentConverter::toDto);
     }
@@ -112,7 +115,7 @@ public class StudentService {
      * @param studentRequestDto the new data for the student
      * @return a {@link Mono} emitting the updated {@link StudentResponseDto}
      */
-    public Mono<StudentResponseDto> updateStudent(String studentId, StudentRequestDto studentRequestDto) {
+    public Mono<Either<Error, StudentResponseDto>> updateStudent(String studentId, StudentRequestDto studentRequestDto) {
         return retrieveStudent(studentId)
                 .flatMap(student -> studentRepository.save(updateStudent(student, studentRequestDto))
                         .map(studentConverter::toDto));
@@ -134,7 +137,7 @@ public class StudentService {
      * @param studentId the ID of the student to delete
      * @return a {@link Mono} emitting true if the student was deleted, false otherwise
      */
-    public Mono<Boolean> deleteStudent(String studentId) {
+    public Mono<Either<Error, Success>> deleteStudent(String studentId) {
         return existsStudent(studentId)
                 .filter(isPresent -> isPresent)
                 .switchIfEmpty(Mono.empty())

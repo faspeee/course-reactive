@@ -26,7 +26,7 @@ public class CourseController {
 
     @GetMapping("/getCourse")
     public Mono<CourseResponseDto> getCourse(@RequestParam String courseId) {
-        return courseService.getCourse(courseId);
+        return courseService.getCourseById(courseId);
     }
 
     @PostMapping("/addCourse")
@@ -40,7 +40,7 @@ public class CourseController {
     @DeleteMapping("/deleteCourse")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteCourse(@RequestParam String courseId) {
-        return courseService.delete(courseId);
+        return courseService.deleteCourseById(courseId);
     }
 
     @PutMapping("/updateCourse")
