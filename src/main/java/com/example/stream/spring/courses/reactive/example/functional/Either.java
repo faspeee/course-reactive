@@ -4,113 +4,59 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * A generic container that holds either a left value of type {@code L} or a right value of type {@code R}, but not both.
- * <p>
- * Inspired by functional programming paradigms, {@code Either} is commonly used to represent a value that is one of two possibilities:
- * typically a success (Right) or a failure (Left).
- * </p>
+ * Represents a value of one of two possible types (a disjoint union).
+ * Instances of Either are either an instance of Left or Right.
  *
- * @param <L> the type of the Left value (often used to represent an error or exceptional case)
- * @param <R> the type of the Right value (often used to represent a success or valid case)
+ * @param <L> the type of the Left value
+ * @param <R> the type of the Right value
  */
-public abstract class Either<L, R> {
-
-    private Either() {
-    }
+public sealed interface Either<L, R> permits Either.Left, Either.Right {
 
     /**
-     * Creates a new {@code Either} instance representing a Left value.
+     * Creates an instance of Left with the given value.
      *
-     * @param value the Left value to store
+     * @param value the Left value
      * @param <L>   the type of the Left value
      * @param <R>   the type of the Right value
-     * @return a new {@code Left} instance
+     * @return an Either representing the Left value
      */
-    public static <L, R> Either<L, R> left(L value) {
+    static <L, R> Either<L, R> left(L value) {
         return new Left<>(value);
     }
 
     /**
-     * Creates a new {@code Either} instance representing a Right value.
+     * Creates an instance of Right with the given value.
      *
-     * @param value the Right value to store
+     * @param value the Right value
      * @param <L>   the type of the Left value
      * @param <R>   the type of the Right value
-     * @return a new {@code Right} instance
+     * @return an Either representing the Right value
      */
-    public static <L, R> Either<L, R> right(R value) {
+    static <L, R> Either<L, R> right(R value) {
         return new Right<>(value);
     }
 
-    /**
-     * Returns {@code true} if this Either instance is a {@code Left}.
-     *
-     * @return {@code true} if this is a Left, otherwise {@code false}
-     */
-    public abstract boolean isLeft();
+    boolean isLeft();
+
+    boolean isRight();
+
+    Optional<L> getLeft();
+
+    Optional<R> getRight();
+
+    <T> Either<L, T> map(Function<? super R, ? extends T> mapper);
+
+    <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper);
+
+    <T> T fold(Function<? super L, T> leftMapper, Function<? super R, T> rightMapper);
 
     /**
-     * Returns {@code true} if this Either instance is a {@code Right}.
-     *
-     * @return {@code true} if this is a Right, otherwise {@code false}
-     */
-    public abstract boolean isRight();
-
-    /**
-     * Retrieves the value if this is a {@code Left}, or returns {@code Optional.empty()} if this is a {@code Right}.
-     *
-     * @return an {@code Optional} containing the Left value, or empty
-     */
-    public abstract Optional<L> getLeft();
-
-    /**
-     * Retrieves the value if this is a {@code Right}, or returns {@code Optional.empty()} if this is a {@code Left}.
-     *
-     * @return an {@code Optional} containing the Right value, or empty
-     */
-    public abstract Optional<R> getRight();
-
-    /**
-     * Applies a mapping function to the Right value if present, otherwise returns the current Left.
-     *
-     * @param mapper a function to transform the Right value
-     * @param <T>    the type of the new Right value
-     * @return a new {@code Either} containing the mapped Right value, or the original Left
-     */
-    public abstract <T> Either<L, T> map(Function<? super R, ? extends T> mapper);
-
-    /**
-     * Applies a mapping function that returns another {@code Either} to the Right value if present,
-     * otherwise returns the current Left.
-     *
-     * @param mapper a function to transform the Right value into another {@code Either}
-     * @param <T>    the type of the new Right value
-     * @return the result of the mapping function if this is a Right, or the original Left
-     */
-    public abstract <T> Either<L, T> flatMap(Function<? super R, Either<L, T>> mapper);
-
-    /**
-     * Applies one of two functions to the contained value depending on whether it is a Left or Right.
-     *
-     * @param leftMapper  function to apply if this is a Left
-     * @param rightMapper function to apply if this is a Right
-     * @param <T>         the type of the returned result
-     * @return the result of applying the appropriate function
-     */
-    public abstract <T> T fold(Function<? super L, T> leftMapper, Function<? super R, T> rightMapper);
-
-    /**
-     * Represents the Left variant of the Either.
+     * Represents the Left value of an Either, typically used to hold an error or failure.
      *
      * @param <L> the type of the Left value
      * @param <R> the type of the Right value
      */
-    private static final class Left<L, R> extends Either<L, R> {
-        private final L value;
-
-        private Left(L value) {
-            this.value = value;
-        }
+    record Left<L, R>(L value) implements Either<L, R> {
 
         @Override
         public boolean isLeft() {
@@ -134,12 +80,12 @@ public abstract class Either<L, R> {
 
         @Override
         public <T> Either<L, T> map(Function<? super R, ? extends T> mapper) {
-            return Either.left(value);
+            return new Left<>(value);
         }
 
         @Override
-        public <T> Either<L, T> flatMap(Function<? super R, Either<L, T>> mapper) {
-            return Either.left(value);
+        public <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper) {
+            return new Left<>(value);
         }
 
         @Override
@@ -149,17 +95,12 @@ public abstract class Either<L, R> {
     }
 
     /**
-     * Represents the Right variant of the Either.
+     * Represents the Right value of an Either, typically used to hold a successful result.
      *
      * @param <L> the type of the Left value
      * @param <R> the type of the Right value
      */
-    private static final class Right<L, R> extends Either<L, R> {
-        private final R value;
-
-        private Right(R value) {
-            this.value = value;
-        }
+    record Right<L, R>(R value) implements Either<L, R> {
 
         @Override
         public boolean isLeft() {
@@ -183,11 +124,11 @@ public abstract class Either<L, R> {
 
         @Override
         public <T> Either<L, T> map(Function<? super R, ? extends T> mapper) {
-            return Either.right(mapper.apply(value));
+            return new Right<>(mapper.apply(value));
         }
 
         @Override
-        public <T> Either<L, T> flatMap(Function<? super R, Either<L, T>> mapper) {
+        public <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper) {
             return mapper.apply(value);
         }
 
@@ -196,4 +137,5 @@ public abstract class Either<L, R> {
             return rightMapper.apply(value);
         }
     }
+
 }
