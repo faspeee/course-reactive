@@ -114,6 +114,7 @@ public class CampusController {
                     @ApiResponse(responseCode = "404", description = "Campus not found")
             })
     @DeleteMapping("/deleteCampus")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteCampus(
             @Parameter(description = "ID of the campus to be deleted") @RequestParam String campusId) {
         return processEmptyResponse(campusService.deleteCampus(campusId));

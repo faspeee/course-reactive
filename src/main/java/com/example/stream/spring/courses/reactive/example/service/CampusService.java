@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static com.example.stream.spring.courses.reactive.example.utility.UtilMono.createMonoWithError;
+
 /**
  * Service class for managing campus entities in a reactive manner.
  * Provides methods for retrieving, creating, updating, and deleting campuses.
@@ -70,7 +72,7 @@ public class CampusService {
                 .flatMap(either -> either.getRight()
                         .map(present -> campusRepository.save(campusConverter.toEntity(campusRequestDto))
                                 .<Either<Error, CampusResponseDto>>map(campus -> Either.right(campusConverter.toDto(campus))))
-                        .orElse(Mono.just(Either.left(either.getLeft().orElse(new GenericError())))));
+                        .orElse(createMonoWithError(either)));
     }
 
     private Mono<Either<Error, Boolean>> existCampusById(String campusId) {
@@ -92,7 +94,7 @@ public class CampusService {
                         .<Mono<Either<Error, Success>>>map(building ->
                                 campusRepository.deleteById(UUID.fromString(campusId))
                                         .then(Mono.just(Either.right(new CampusDeleteOk()))))
-                        .orElse(Mono.just(Either.left(either.getLeft().orElse(new GenericError())))));
+                        .orElse(createMonoWithError(either)));
     }
 
     private Mono<Either<Error, Boolean>> existUniversity(String universityId) {
@@ -116,11 +118,13 @@ public class CampusService {
      */
     public Mono<Either<Error, CampusResponseDto>> updateCampus(String campusId, CampusRequestDto campusRequestDto) {
         return existUniversity(campusRequestDto.universityId())
-                .flatMap(isPresent -> retrieveCampusById(campusId)
-                        .flatMap(either -> either.getRight()
-                                .map(campus -> campusRepository.save(updateCampus(campus, campusRequestDto))
-                                        .<Either<Error, CampusResponseDto>>map(campus1 -> Either.right(campusConverter.toDto(campus1))))
-                                .orElse(Mono.just(Either.left(new GenericError())))));
+                .flatMap(either1 -> either1.getRight()
+                        .map(result -> retrieveCampusById(campusId)
+                                .flatMap(either -> either.getRight()
+                                        .map(campus -> campusRepository.save(updateCampus(campus, campusRequestDto))
+                                                .<Either<Error, CampusResponseDto>>map(campus1 -> Either.right(campusConverter.toDto(campus1))))
+                                        .orElse(createMonoWithError(either))))
+                        .orElse(createMonoWithError(either1)));
 
     }
 

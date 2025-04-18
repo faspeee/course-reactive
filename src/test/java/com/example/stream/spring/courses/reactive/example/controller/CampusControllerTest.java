@@ -128,7 +128,7 @@ class CampusControllerTest {
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The university is not found");
+                .jsonPath("$.message").isEqualTo("University not found");
         ;
     }
 
@@ -222,7 +222,7 @@ class CampusControllerTest {
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The campus is not found");
+                .jsonPath("$.message").isEqualTo("Campus not found");
     }
 
     @Test
@@ -248,12 +248,12 @@ class CampusControllerTest {
 
         // Set other properties as needed
 
-        webTestClient.put().uri("/campus/updateCampus?campusId=068ec73a-5210-4891-b4d2-a988541e3154")
+        webTestClient.put().uri("/campus/updateCampus?campusId=5919b48f-1220-46df-b966-52143ef2f995")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existingCampus)
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The university is not found");
+                .jsonPath("$.message").isEqualTo("University not found");
     }
 }

@@ -45,8 +45,10 @@ public class CourseService {
 
     public Mono<Either<Error, CourseResponseDto>> addCourse(CourseRequestDto courseDto) {
         return departmentService.existDepartmentById(courseDto.departmentId())
-                .flatMap(result -> courseRepository.save(converter.toEntity(courseDto))
-                        .map(course -> Either.right(converter.toDto(course))));
+                .flatMap(either -> either.getRight()
+                        .map(result -> courseRepository.save(converter.toEntity(courseDto))
+                                .<Either<Error, CourseResponseDto>>map(course -> Either.right(converter.toDto(course))))
+                        .orElse(createMonoWithError(either)));
     }
 
     private Mono<Either<Error, Course>> retrieveCourseById(String courseId) {

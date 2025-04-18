@@ -117,7 +117,7 @@ public final class ProcessResponses {
         };
     }
 
-    public static <T> Mono<T> checkLeft(Error error) {
+    private static <T> Mono<T> checkLeft(Error error) {
         return switch (error) {
             case BuildingError buildingError -> handlerBuildingError(buildingError);
             case CampusError campusError -> handlerCampusError(campusError);

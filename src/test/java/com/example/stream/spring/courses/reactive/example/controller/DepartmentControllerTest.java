@@ -59,7 +59,7 @@ class DepartmentControllerTest {
 
     @Test
     void add_department_test() {
-        DepartmentRequestDto newDepartment = createDepartmentDto("John Doe", "code course", "282018392KS", "19902a0f-e444-4118-9fe0-d5d61e3750dc");
+        DepartmentRequestDto newDepartment = createDepartmentDto("John Doe", "code course", "282018392KS", "bf4ee2ee-cfe9-41fc-b56c-9fefee9da858");
         // Set other properties as needed
 
         webTestClient.post().uri("/department/addDepartment")
@@ -78,7 +78,7 @@ class DepartmentControllerTest {
 
     @Test
     void delete_department_test() {
-        String departmentId = "bf4eecee-cfe9-41fc-b56c-9fefee9da858"; // Replace with a valid course ID to delete
+        String departmentId = "1a6c2f08-81e8-438f-b37f-01a1c862efe7"; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/department/deleteDepartment")
                         .queryParam("departmentId", departmentId)
                         .build())
@@ -89,7 +89,7 @@ class DepartmentControllerTest {
     @Test
     void update_department_test() {
 
-        DepartmentRequestDto newDepartment = createDepartmentDto("John Doe Department", "code course", "282018392KS", "19902a0f-e444-4118-9fe0-d5d61e3750dc");
+        DepartmentRequestDto newDepartment = createDepartmentDto("John Doe Department", "code course", "282018392KS", "1990230f-e444-4118-9fe0-d5d61e3750dc");
         // Set other properties as needed
 
         String departmentId = webTestClient.post().uri("/department/addDepartment")
@@ -105,7 +105,7 @@ class DepartmentControllerTest {
                     assertEquals("John Doe Department", createdDepartment.name());
                 }).returnResult().getResponseBody().departmentId();
 
-        DepartmentRequestDto existingDepartment = createDepartmentDto("Updated Department Name", "code course", "282018392KS", "bf4eecee-cfe9-41fc-b56c-9fefee9da858");
+        DepartmentRequestDto existingDepartment = createDepartmentDto("Updated Department Name", "code course", "282018392KS", "bf4ee2ee-cfe9-41fc-b56c-9fefee9da858");
 
         // Set other properties as needed
 
