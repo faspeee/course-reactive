@@ -9,11 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
 
 @RestController
 @RequestMapping("/student")
@@ -47,11 +51,9 @@ public class StudentController {
             }
     )
     @GetMapping(value = "/getStudent", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<StudentResponseDto>> getStudent(
+    public Mono<Optional<StudentResponseDto>> getStudent(
             @Parameter(description = "ID of the student to be retrieved") @RequestParam("studentId") String studentId) {
-        return studentService.getStudentById(studentId)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The student is not found")))
-                .map(ResponseEntity::ok);
+        return processTheResultFromService(studentService.getStudentById(studentId));
     }
 
     @Operation(
@@ -63,9 +65,9 @@ public class StudentController {
     )
     @PostMapping(value = "/addStudent", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<StudentResponseDto> addStudent(
+    public Mono<Optional<StudentResponseDto>> addStudent(
             @Parameter(description = "Student details for the new student") @RequestBody StudentRequestDto studentRequestDto) {
-        return studentService.createStudent(studentRequestDto);
+        return processTheResultFromService(studentService.createStudent(studentRequestDto));
     }
 
     @Operation(
@@ -77,12 +79,10 @@ public class StudentController {
             }
     )
     @PutMapping(value = "/updateStudent", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<StudentResponseDto>> updateStudent(
+    public Mono<Optional<StudentResponseDto>> updateStudent(
             @Parameter(description = "Updated student details") @RequestBody StudentRequestDto studentRequestDto,
             @Parameter(description = "ID of the student to update") @RequestParam String studentId) {
-        return studentService.updateStudent(studentId, studentRequestDto)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The student is not found")))
-                .map(ResponseEntity::ok);
+        return processTheResultFromService(studentService.updateStudent(studentId, studentRequestDto));
     }
 
     @Operation(
@@ -97,9 +97,7 @@ public class StudentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteStudent(
             @Parameter(description = "ID of the student to be deleted") @RequestParam("studentId") String studentId) {
-        return studentService.deleteStudent(studentId)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The student is not found")))
-                .flatMap(present -> Mono.empty());
+        return processEmptyResponse(studentService.deleteStudent(studentId));
 
     }
 

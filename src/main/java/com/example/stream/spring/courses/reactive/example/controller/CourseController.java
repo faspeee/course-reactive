@@ -5,10 +5,14 @@ import com.example.stream.spring.courses.reactive.example.model.response.CourseR
 import com.example.stream.spring.courses.reactive.example.service.CourseService;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
 
 @RestController
 @RequestMapping("/courses")
@@ -25,29 +29,27 @@ public class CourseController {
     }
 
     @GetMapping("/getCourse")
-    public Mono<CourseResponseDto> getCourse(@RequestParam String courseId) {
-        return courseService.getCourseById(courseId);
+    public Mono<Optional<CourseResponseDto>> getCourse(@RequestParam String courseId) {
+        return processTheResultFromService(courseService.getCourseById(courseId));
     }
 
     @PostMapping("/addCourse")
-    public Mono<ResponseEntity<CourseResponseDto>> addCourse(@RequestBody CourseRequestDto courseDto) {
-        return courseService.addCourse(courseDto)
-                .map(courseResponseDto -> ResponseEntity
-                        .status(HttpStatus.CREATED)
-                        .body(courseResponseDto));
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<Optional<CourseResponseDto>> addCourse(@RequestBody CourseRequestDto courseDto) {
+        return processTheResultFromService(courseService.addCourse(courseDto));
     }
 
     @DeleteMapping("/deleteCourse")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteCourse(@RequestParam String courseId) {
-        return courseService.deleteCourseById(courseId);
+        return processEmptyResponse(courseService.deleteCourseById(courseId));
     }
 
     @PutMapping("/updateCourse")
-    public Mono<CourseResponseDto> updateCourse(
+    public Mono<Optional<CourseResponseDto>> updateCourse(
             @Parameter(description = "ID of the course to be updated") @RequestParam String courseId,
             @RequestBody CourseRequestDto courseDto) {
-        return courseService.updateCourse(courseId, courseDto);
+        return processTheResultFromService(courseService.updateCourse(courseId, courseDto));
     }
 
     @GetMapping("/{departmentId}/course")

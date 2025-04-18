@@ -4,17 +4,17 @@ import com.example.stream.spring.courses.reactive.example.converter.UniversityCo
 import com.example.stream.spring.courses.reactive.example.entity.University;
 import com.example.stream.spring.courses.reactive.example.functional.Either;
 import com.example.stream.spring.courses.reactive.example.model.error.Error;
-import com.example.stream.spring.courses.reactive.example.model.error.Success;
+import com.example.stream.spring.courses.reactive.example.model.error.*;
 import com.example.stream.spring.courses.reactive.example.model.request.UniversityRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.UniversityResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.UniversityRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static com.example.stream.spring.courses.reactive.example.utility.UtilMono.createMonoWithError;
 
 @Service
 public class UniversityService {
@@ -34,12 +34,13 @@ public class UniversityService {
 
     public Mono<Either<Error, UniversityResponseDto>> findUniversityById(String universityId) {
         return getUniversityById(UUID.fromString(universityId))
-                .map(universityConverter::toDto);
+                .map(errorUniversityEither -> errorUniversityEither.map(universityConverter::toDto));
     }
 
     public Mono<Either<Error, UniversityResponseDto>> createUniversity(UniversityRequestDto universityRequestDto) {
         return universityRepository.save(universityConverter.toEntity(universityRequestDto))
-                .map(universityConverter::toDto);
+                .<Either<Error, UniversityResponseDto>>map(university -> Either.right(universityConverter.toDto(university)))
+                .switchIfEmpty(Mono.just(Either.left(new GenericError())));
     }
 
     private University updateUniversity(University university, UniversityRequestDto universityRequestDto) {
@@ -65,18 +66,33 @@ public class UniversityService {
         return university;
     }
 
-    private Mono<University> getUniversityById(UUID universityId) {
-        return universityRepository.findById(universityId);
+    private Mono<Either<Error, University>> getUniversityById(UUID universityId) {
+        return universityRepository.findById(universityId)
+                .<Either<Error, University>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new UniversityNotFound())));
     }
 
     public Mono<Either<Error, UniversityResponseDto>> updateUniversity(String universityId, UniversityRequestDto universityRequestDto) {
         return getUniversityById(UUID.fromString(universityId))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "university not found")))
-                .flatMap(university -> universityRepository.save(updateUniversity(university, universityRequestDto))
-                        .map(universityConverter::toDto));
+                .flatMap(either -> either.getRight()
+                        .map(university -> universityRepository.save(updateUniversity(university, universityRequestDto))
+                                .<Either<Error, UniversityResponseDto>>map(university1 -> Either.right(universityConverter.toDto(university1))))
+                        .orElse(createMonoWithError(either)));
+    }
+
+    public Mono<Either<Error, Boolean>> existUniversityById(String universityId) {
+        return universityRepository.existsById(UUID.fromString(universityId))
+                .filter(Boolean::booleanValue)
+                .<Either<Error, Boolean>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new UniversityNotFound())));
     }
 
     public Mono<Either<Error, Success>> deleteUniversity(String universityId) {
-        return universityRepository.deleteById(UUID.fromString(universityId));
+        return existUniversityById(universityId)
+                .flatMap(either -> either.getRight()
+                        .<Mono<Either<Error, Success>>>map(building ->
+                                universityRepository.deleteById(UUID.fromString(universityId))
+                                        .then(Mono.just(Either.right(new UniversityDeleteOk()))))
+                        .orElse(createMonoWithError(either)));
     }
 }

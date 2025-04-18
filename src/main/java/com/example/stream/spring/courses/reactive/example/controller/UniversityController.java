@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
+
 @RestController
 @RequestMapping("/university")
 public class UniversityController {
@@ -24,24 +29,24 @@ public class UniversityController {
     }
 
     @GetMapping("/getUniversityById")
-    public Mono<UniversityResponseDto> getUniversityById(@RequestParam String universityId) {
-        return universityService.findUniversityById(universityId);
+    public Mono<Optional<UniversityResponseDto>> getUniversityById(@RequestParam String universityId) {
+        return processTheResultFromService(universityService.findUniversityById(universityId));
     }
 
     @PostMapping("/addUniversity")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UniversityResponseDto> addUniversity(@Valid @RequestBody UniversityRequestDto universityRequestDto) {
-        return universityService.createUniversity(universityRequestDto);
+    public Mono<Optional<UniversityResponseDto>> addUniversity(@Valid @RequestBody UniversityRequestDto universityRequestDto) {
+        return processTheResultFromService(universityService.createUniversity(universityRequestDto));
     }
 
     @PutMapping("/updateUniversity")
-    public Mono<UniversityResponseDto> updateUniversity(@RequestParam String universityId, @Valid @RequestBody UniversityRequestDto universityRequestDto) {
-        return universityService.updateUniversity(universityId, universityRequestDto);
+    public Mono<Optional<UniversityResponseDto>> updateUniversity(@RequestParam String universityId, @Valid @RequestBody UniversityRequestDto universityRequestDto) {
+        return processTheResultFromService(universityService.updateUniversity(universityId, universityRequestDto));
     }
 
     @DeleteMapping("/deleteUniversity")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteUniversity(@RequestParam String universityId) {
-        return universityService.deleteUniversity(universityId);
+        return processEmptyResponse(universityService.deleteUniversity(universityId));
     }
 }

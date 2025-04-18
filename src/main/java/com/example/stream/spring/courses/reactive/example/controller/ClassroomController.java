@@ -12,10 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
 
 /**
  * REST controller for managing classroom-related operations.
@@ -35,6 +39,7 @@ public class ClassroomController {
     public ClassroomController(ClassroomService classroomService) {
         this.classroomService = classroomService;
     }
+
 
     /**
      * Retrieves all classroom.
@@ -64,11 +69,9 @@ public class ClassroomController {
             @ApiResponse(responseCode = "404", description = "classroom not found")
     })
     @GetMapping(value = "/getClassroom", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<ClassroomResponseDto>> getClassroom(
+    public Mono<Optional<ClassroomResponseDto>> getClassroom(
             @Parameter(description = "ID of the classroom to be retrieved") @RequestParam("classroomId") String classroomId) {
-        return classroomService.getClassroomById(classroomId)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return processTheResultFromService(classroomService.getClassroomById(classroomId));
     }
 
     /**
@@ -83,9 +86,9 @@ public class ClassroomController {
                     schema = @Schema(implementation = ClassroomResponseDto.class)))
     @PostMapping(value = "/addClassroom", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ClassroomResponseDto> addClassroom(
+    public Mono<Optional<ClassroomResponseDto>> addClassroom(
             @Parameter(description = "Classroom details for the new department") @RequestBody ClassroomRequestDto classroomRequestDto) {
-        return classroomService.addClassroom(classroomRequestDto);
+        return processTheResultFromService(classroomService.addClassroom(classroomRequestDto));
     }
 
     /**
@@ -102,12 +105,10 @@ public class ClassroomController {
             @ApiResponse(responseCode = "404", description = "Classroom not found")
     })
     @PutMapping(value = "/updateClassroom", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<ClassroomResponseDto>> updateClassroom(
+    public Mono<Optional<ClassroomResponseDto>> updateClassroom(
             @Parameter(description = "Updated classroom details") @RequestBody ClassroomRequestDto classroomRequestDto,
             @RequestParam String classroomId) {
-        return classroomService.updateClassroom(classroomId, classroomRequestDto)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return processTheResultFromService(classroomService.updateClassroom(classroomId, classroomRequestDto));
     }
 
     /**
@@ -122,6 +123,6 @@ public class ClassroomController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteClassroom(
             @Parameter(description = "ID of the classroom to be deleted") @RequestParam("classroomId") String classroomId) {
-        return classroomService.deleteClassroom(classroomId);
+        return processEmptyResponse(classroomService.deleteClassroom(classroomId));
     }
 }

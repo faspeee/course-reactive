@@ -111,7 +111,7 @@ public class BuildingService {
      * @param buildingId the UUID string of the building
      * @return a {@link Mono} of {@link Either} containing true if found or an error if not
      */
-    private Mono<Either<Error, Boolean>> existBuildingById(String buildingId) {
+    public Mono<Either<Error, Boolean>> existBuildingById(String buildingId) {
         return buildingRepository.existsById(UUID.fromString(buildingId))
                 .filter(Boolean::booleanValue)
                 .<Either<Error, Boolean>>map(Either::right)

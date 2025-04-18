@@ -4,17 +4,18 @@ import com.example.stream.spring.courses.reactive.example.converter.InstructorCo
 import com.example.stream.spring.courses.reactive.example.entity.Instructor;
 import com.example.stream.spring.courses.reactive.example.functional.Either;
 import com.example.stream.spring.courses.reactive.example.model.error.Error;
-import com.example.stream.spring.courses.reactive.example.model.error.Success;
+import com.example.stream.spring.courses.reactive.example.model.error.*;
 import com.example.stream.spring.courses.reactive.example.model.request.InstructorRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.InstructorResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.InstructorRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static com.example.stream.spring.courses.reactive.example.utility.UtilMono.createMonoWithError;
 
 /**
  * Service class that provides reactive operations for managing {@link Instructor} entities.
@@ -51,11 +52,13 @@ public class InstructorService {
      * Retrieves an {@link Instructor} entity by its unique identifier.
      * This is a private helper method used internally for reuse in public-facing operations.
      *
-     * @param id the {@link UUID} of the instructor to retrieve.
+     * @param instructorId the {@link UUID} of the instructor to retrieve.
      * @return a {@link Mono} containing the {@link Instructor} if found; otherwise an empty {@link Mono}.
      */
-    private Mono<Instructor> getInstructorById(UUID id) {
-        return instructorRepository.findById(id);
+    private Mono<Either<Error, Instructor>> getInstructorById(UUID instructorId) {
+        return instructorRepository.findById(instructorId)
+                .<Either<Error, Instructor>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new InstructorNotFound())));
     }
 
     /**
@@ -66,7 +69,7 @@ public class InstructorService {
      */
     public Mono<Either<Error, InstructorResponseDto>> getInstructorById(String instructorId) {
         return getInstructorById(UUID.fromString(instructorId))
-                .map(instructorConverter::toDto);
+                .map(errorInstructorEither -> errorInstructorEither.map(instructorConverter::toDto));
     }
 
     /**
@@ -78,7 +81,7 @@ public class InstructorService {
      */
     public Mono<Either<Error, InstructorResponseDto>> createInstructor(InstructorRequestDto requestDto) {
         return instructorRepository.save(instructorConverter.toEntity(requestDto))
-                .map(instructorConverter::toDto);
+                .map(instructor -> Either.right(instructorConverter.toDto(instructor)));
     }
 
     /**
@@ -106,9 +109,17 @@ public class InstructorService {
      */
     public Mono<Either<Error, InstructorResponseDto>> updateInstructor(String instructorId, InstructorRequestDto requestDto) {
         return getInstructorById(UUID.fromString(instructorId))
-                .flatMap(instructor -> instructorRepository.save(updateInstructor(instructor, requestDto))
-                        .map(instructorConverter::toDto))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found")));
+                .flatMap(either -> either.getRight()
+                        .map(instructor -> instructorRepository.save(updateInstructor(instructor, requestDto))
+                                .<Either<Error, InstructorResponseDto>>map(instructor1 -> Either.right(instructorConverter.toDto(instructor1))))
+                        .orElse(createMonoWithError(either)));
+    }
+
+    private Mono<Either<Error, Boolean>> existInstructorById(String campusId) {
+        return instructorRepository.existsById(UUID.fromString(campusId))
+                .filter(Boolean::booleanValue)
+                .<Either<Error, Boolean>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new BuildingNotFound())));
     }
 
     /**
@@ -127,10 +138,12 @@ public class InstructorService {
      * or the deletion operation fails.
      */
     public Mono<Either<Error, Success>> deleteInstructor(String instructorId) {
-        return instructorRepository.existsById(UUID.fromString(instructorId))
-                .filter(isPresent -> isPresent)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found")))
-                .flatMap(present -> instructorRepository.deleteById(UUID.fromString(instructorId)));
+        return existInstructorById(instructorId)
+                .flatMap(either -> either.getRight()
+                        .<Mono<Either<Error, Success>>>map(building ->
+                                instructorRepository.deleteById(UUID.fromString(instructorId))
+                                        .then(Mono.just(Either.right(new StudentDeleteOk()))))
+                        .orElse(createMonoWithError(either)));
 
     }
 }

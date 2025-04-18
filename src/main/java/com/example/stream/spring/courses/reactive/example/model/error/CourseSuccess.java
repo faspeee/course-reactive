@@ -1,0 +1,4 @@
+package com.example.stream.spring.courses.reactive.example.model.error;
+
+public sealed interface CourseSuccess extends Success permits CourseDeleteOk {
+}

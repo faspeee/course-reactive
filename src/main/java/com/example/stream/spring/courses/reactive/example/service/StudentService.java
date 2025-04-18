@@ -4,6 +4,8 @@ import com.example.stream.spring.courses.reactive.example.converter.StudentConve
 import com.example.stream.spring.courses.reactive.example.entity.Student;
 import com.example.stream.spring.courses.reactive.example.functional.Either;
 import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.StudentDeleteOk;
+import com.example.stream.spring.courses.reactive.example.model.error.StudentNotFound;
 import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.StudentRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.StudentResponseDto;
@@ -15,6 +17,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static com.example.stream.spring.courses.reactive.example.utility.UtilMono.createMonoWithError;
 
 /**
  * Service class for managing student-related operations in a reactive and non-blocking manner.
@@ -67,8 +71,10 @@ public class StudentService {
      * @param studentId the ID of the student as a string
      * @return a {@link Mono} emitting the {@link Student} entity if found
      */
-    private Mono<Student> retrieveStudent(String studentId) {
-        return studentRepository.findById(UUID.fromString(studentId));
+    private Mono<Either<Error, Student>> retrieveStudent(String studentId) {
+        return studentRepository.findById(UUID.fromString(studentId))
+                .<Either<Error, Student>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new StudentNotFound())));
     }
 
     /**
@@ -79,7 +85,7 @@ public class StudentService {
      */
     public Mono<Either<Error, StudentResponseDto>> getStudentById(String studentId) {
         return retrieveStudent(studentId)
-                .map(studentConverter::toDto);
+                .map(errorStudentEither -> errorStudentEither.map(studentConverter::toDto));
     }
 
     /**
@@ -90,7 +96,7 @@ public class StudentService {
      */
     public Mono<Either<Error, StudentResponseDto>> createStudent(StudentRequestDto studentRequestDto) {
         return studentRepository.save(studentConverter.toEntity(studentRequestDto))
-                .map(studentConverter::toDto);
+                .map(student -> Either.right(studentConverter.toDto(student)));
     }
 
     /**
@@ -117,8 +123,10 @@ public class StudentService {
      */
     public Mono<Either<Error, StudentResponseDto>> updateStudent(String studentId, StudentRequestDto studentRequestDto) {
         return retrieveStudent(studentId)
-                .flatMap(student -> studentRepository.save(updateStudent(student, studentRequestDto))
-                        .map(studentConverter::toDto));
+                .flatMap(either -> either.getRight()
+                        .map(student -> studentRepository.save(updateStudent(student, studentRequestDto))
+                                .<Either<Error, StudentResponseDto>>map(student1 -> Either.right(studentConverter.toDto(student))))
+                        .orElse(createMonoWithError(either)));
     }
 
     /**
@@ -127,8 +135,11 @@ public class StudentService {
      * @param studentId the ID of the student to check
      * @return a {@link Mono} emitting true if found, otherwise false
      */
-    private Mono<Boolean> existsStudent(String studentId) {
-        return studentRepository.existsById(UUID.fromString(studentId));
+    private Mono<Either<Error, Boolean>> existsStudent(String studentId) {
+        return studentRepository.existsById(UUID.fromString(studentId))
+                .filter(Boolean::booleanValue)
+                .<Either<Error, Boolean>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new StudentNotFound())));
     }
 
     /**
@@ -139,10 +150,11 @@ public class StudentService {
      */
     public Mono<Either<Error, Success>> deleteStudent(String studentId) {
         return existsStudent(studentId)
-                .filter(isPresent -> isPresent)
-                .switchIfEmpty(Mono.empty())
-                .flatMap(present -> studentRepository.deleteById(UUID.fromString(studentId))
-                        .then(Mono.just(true)));
+                .flatMap(either -> either.getRight()
+                        .<Mono<Either<Error, Success>>>map(building ->
+                                studentRepository.deleteById(UUID.fromString(studentId))
+                                        .then(Mono.just(Either.right(new StudentDeleteOk()))))
+                        .orElse(createMonoWithError(either)));
     }
 
     /**

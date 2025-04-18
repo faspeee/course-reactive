@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
+
 /**
  * REST controller for managing instructor-related operations.
  * Provides endpoints for creating, retrieving, updating, and deleting instructors.
@@ -71,9 +76,9 @@ public class InstructorController {
                     @ApiResponse(responseCode = "404", description = "Instructor not found", content = @Content)
             }
     )
-    public Mono<InstructorResponseDto> getInstructorById(
+    public Mono<Optional<InstructorResponseDto>> getInstructorById(
             @Parameter(description = "UUID of the instructor") @RequestParam String instructorId) {
-        return instructorService.getInstructorById(instructorId);
+        return processTheResultFromService(instructorService.getInstructorById(instructorId));
     }
 
     /**
@@ -94,9 +99,9 @@ public class InstructorController {
                     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
             }
     )
-    public Mono<InstructorResponseDto> addInstructor(
+    public Mono<Optional<InstructorResponseDto>> addInstructor(
             @Valid @RequestBody InstructorRequestDto requestDto) {
-        return instructorService.createInstructor(requestDto);
+        return processTheResultFromService(instructorService.createInstructor(requestDto));
     }
 
     /**
@@ -117,10 +122,10 @@ public class InstructorController {
                     @ApiResponse(responseCode = "404", description = "Instructor not found", content = @Content)
             }
     )
-    public Mono<InstructorResponseDto> updateInstructor(
+    public Mono<Optional<InstructorResponseDto>> updateInstructor(
             @Parameter(description = "UUID of the instructor to update") @RequestParam String instructorId,
             @Valid @RequestBody InstructorRequestDto requestDto) {
-        return instructorService.updateInstructor(instructorId, requestDto);
+        return processTheResultFromService(instructorService.updateInstructor(instructorId, requestDto));
     }
 
     /**
@@ -141,6 +146,6 @@ public class InstructorController {
     )
     public Mono<Void> deleteInstructor(
             @Parameter(description = "UUID of the instructor to delete") @RequestParam String instructorId) {
-        return instructorService.deleteInstructor(instructorId);
+        return processEmptyResponse(instructorService.deleteInstructor(instructorId));
     }
 }
