@@ -42,7 +42,7 @@ class UniversityControllerTest {
     @Test
     void get_university_test() {
         String universityId = "068ec73a-5210-4891-b4d2-a988541e3854"; // Replace with a valid course ID
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/university/getUniversity")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/university/getUniversityById")
                         .queryParam("universityId", universityId)
                         .build())
                 .exchange()
@@ -114,7 +114,7 @@ class UniversityControllerTest {
 
     @Test
     void delete_university_test() {
-        long universityId = 1; // Replace with a valid course ID to delete
+        String universityId = "068ec73a-5210-4891-b4d2-a988541e3854"; // Replace with a valid course ID to delete
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path("/university/deleteUniversity")
                         .queryParam("universityId", universityId)
                         .build())
@@ -124,6 +124,26 @@ class UniversityControllerTest {
 
     @Test
     void update_university_test() {
+        UniversityRequestDto newUniversity = createUniversityDto("Springfield UniversityService", "742 Evergreen Terrace, Springfield",
+                LocalDate.of(1950, 9, 15), "Higher Learning Commission", "Dr. Jane Smith",
+                15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
+                "+1-555-123-4567", "Knowledge and Wisdom", "Blue and Gold", "The Fighting Squirrel",
+                150.75, 10, 85, true, 120, "id", "USA", "Springfield");
+        // Set other properties as needed
+
+        String universityId = webTestClient.post().uri("/university/addUniversity")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newUniversity)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(UniversityResponseDto.class)
+                .consumeWith(response -> {
+                    UniversityResponseDto createdUniversity = response.getResponseBody();
+                    assertNotNull(createdUniversity);
+                    assertNotNull(createdUniversity.accreditation());
+                    assertEquals("Springfield UniversityService", createdUniversity.name());
+                }).returnResult().getResponseBody().universityId();
+
         UniversityRequestDto existingUniversity = createUniversityDto("Guantanamo UniversityService", "742 Evergreen Terrace, Springfield",
                 LocalDate.of(1950, 9, 15), "Higher Learning Commission", "Dr. Jane Smith",
                 15000, "https://www.springfielduniversity.edu", "info@springfielduniversity.edu",
@@ -132,7 +152,7 @@ class UniversityControllerTest {
 
         // Set other properties as needed
 
-        webTestClient.put().uri("/university/updateDepartment")
+        webTestClient.put().uri("/university/updateUniversity?universityId=" + universityId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existingUniversity)
                 .exchange()

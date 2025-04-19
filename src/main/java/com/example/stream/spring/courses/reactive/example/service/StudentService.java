@@ -48,6 +48,7 @@ public class StudentService {
         student.setName(studentRequestDto.name());
         student.setSurname(studentRequestDto.surname());
         student.setEmail(studentRequestDto.email());
+        student.setFreshman(studentRequestDto.freshman());
         return student;
     }
 
