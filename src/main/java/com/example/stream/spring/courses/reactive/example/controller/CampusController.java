@@ -38,8 +38,8 @@ public class CampusController {
      *
      * @return a {@link ResponseEntity} containing a {@link Flux} emitting all {@link CampusResponseDto}s
      */
-    @Operation(summary = "Retrieve all campuses", description = "Fetches details of all available campuses.")
-    @ApiResponse(responseCode = "200", description = "List of campuses retrieved successfully")
+    @Operation(summary = "Retrieve all campuses", description = "Fetches details of all available campuses.",
+            responses = {@ApiResponse(responseCode = "200", description = "List of campuses retrieved successfully")})
     @GetMapping("/getAllCampus")
     public ResponseEntity<Flux<CampusResponseDto>> getAllCampus() {
         return ResponseEntity.ok().body(campusService.getAllCampus());
