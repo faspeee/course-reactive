@@ -53,6 +53,30 @@ class CampusControllerTest {
     }
 
     @Test
+    void get_campus_not_found_test() {
+        String campusId = "e4b44ebc-7163-4c79-96d4-4e0c61034efc"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/campus/getCampus")
+                        .queryParam("campusId", campusId)
+                        .build())
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Campus not found");
+    }
+
+    @Test
+    void get_campus_error_server_test() {
+        String campusId = "12332"; // Replace with a valid course ID
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/campus/getCampus")
+                        .queryParam("campusId", campusId)
+                        .build())
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid UUID string: 12332");
+    }
+
+    @Test
     void add_campus_test() {
         CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", "068ec73a-5210-4891-b4d2-a988541e3854",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3), "identifier", "Italy", "Napoli");
@@ -84,7 +108,10 @@ class CampusControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(newCampusDto)
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid UUID string: 1L");
+        ;
     }
 
     @DisplayName("when try to add campus on not found university , the service throw error")
@@ -101,7 +128,7 @@ class CampusControllerTest {
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The university is not found");
+                .jsonPath("$.message").isEqualTo("University not found");
         ;
     }
 
@@ -185,53 +212,48 @@ class CampusControllerTest {
 
     @Test
     void update_campus_not_found_test() {
-
-
         CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", "068ec73a-5210-4891-b4d2-a988541e3854",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
                 "identifier 2", "Italy", "Napoli");
         // Set other properties as needed
-        webTestClient.put().uri("/campus/updateCampus?campusId=" + "068ec73a-5210-4891-b4d2-a988541e3854")
+        webTestClient.put().uri("/campus/updateCampus?campusId=068ec73a-5210-4891-b4d2-a988541e3854")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existingCampus)
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The campus is not found");
+                .jsonPath("$.message").isEqualTo("Campus not found");
+    }
+
+    @Test
+    void update_campus_server_error_test() {
+        CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", "068ec73a-5210-4891-b4d2-a988541e3854",
+                LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
+                "identifier 2", "Italy", "Napoli");
+        // Set other properties as needed
+        webTestClient.put().uri("/campus/updateCampus?campusId=111111")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(existingCampus)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Invalid UUID string: 111111");
     }
 
     @Test
     void update_campus_university_not_found_test() {
-        CampusRequestDto newCampusDto = createCampusDto("Campus Maradona", "Napoli 500", "068ec73a-5210-4891-b4d2-a988541e3854",
-                LocalDateTime.now(), LocalDateTime.now().plusMonths(3), "identifier", "Italy", "Napoli");
-        // Set other properties as needed
-
-        String campusId = webTestClient.post().uri("/campus/addCampus")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(newCampusDto)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(CampusResponseDto.class)
-                .consumeWith(response -> {
-                    CampusResponseDto createCampus = response.getResponseBody();
-                    assertNotNull(createCampus);
-                    assertNotNull(createCampus.country());
-                    assertEquals("Campus Maradona", createCampus.name());
-                }).returnResult().getResponseBody().campusId();
-
         CampusRequestDto existingCampus = createCampusDto("Campus Messi", "Napoli 550", "068ec73a-5210-4891-b1d2-a988541e3854",
                 LocalDateTime.now(), LocalDateTime.now().plusMonths(3),
                 "identifier 2", "Italy", "Napoli");
 
         // Set other properties as needed
 
-        webTestClient.put().uri("/campus/updateCampus?campusId=" + campusId)
+        webTestClient.put().uri("/campus/updateCampus?campusId=5919b48f-1220-46df-b966-52143ef2f995")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(existingCampus)
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The university is not found");
-        ;
+                .jsonPath("$.message").isEqualTo("University not found");
     }
 }

@@ -79,7 +79,7 @@ class CourseControllerTest {
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The department is not found");
+                .jsonPath("$.message").isEqualTo("Department not found");
     }
 
     @DisplayName("add course in department not found throw error")

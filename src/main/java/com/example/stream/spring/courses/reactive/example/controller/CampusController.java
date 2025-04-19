@@ -6,13 +6,17 @@ import com.example.stream.spring.courses.reactive.example.service.CampusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
 
 /**
  * REST controller for managing campus-related operations.
@@ -33,6 +37,7 @@ public class CampusController {
         this.campusService = campusService;
     }
 
+
     /**
      * Retrieves all campuses.
      *
@@ -51,15 +56,15 @@ public class CampusController {
      * @param campusId the unique identifier of the campus
      * @return a {@link ResponseEntity} containing a {@link Mono} emitting the {@link CampusResponseDto} if found
      */
-    @Operation(summary = "Retrieve a campus by its ID", description = "Fetches a campus's details using its unique identifier.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Campus found"),
-            @ApiResponse(responseCode = "404", description = "Campus not found")
-    })
+    @Operation(summary = "Retrieve a campus by its ID", description = "Fetches a campus's details using its unique identifier.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Campus found"),
+                    @ApiResponse(responseCode = "404", description = "Campus not found")
+            })
     @GetMapping("/getCampus")
-    public ResponseEntity<Mono<CampusResponseDto>> getCampus(
+    public Mono<Optional<CampusResponseDto>> getCampus(
             @Parameter(description = "ID of the campus to be retrieved") @RequestParam String campusId) {
-        return ResponseEntity.ok().body(campusService.getCampus(campusId));
+        return processTheResultFromService(campusService.getCampusById(campusId));
     }
 
     /**
@@ -68,16 +73,15 @@ public class CampusController {
      * @param campusRequestDto the data transfer object containing campus details
      * @return a {@link ResponseEntity} containing a {@link Mono} emitting the created {@link CampusResponseDto}
      */
-    @Operation(summary = "Add a new campus", description = "Creates a new campus with the provided details.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Campus created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Add a new campus", description = "Creates a new campus with the provided details.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Campus created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input")
+            })
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/addCampus")
-    public ResponseEntity<Mono<CampusResponseDto>> addCampus(@RequestBody CampusRequestDto campusRequestDto) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(campusService.addCampus(campusRequestDto));
+    public Mono<Optional<CampusResponseDto>> addCampus(@RequestBody CampusRequestDto campusRequestDto) {
+        return processTheResultFromService(campusService.addCampus(campusRequestDto));
     }
 
     /**
@@ -86,16 +90,16 @@ public class CampusController {
      * @param campusRequestDto the data transfer object containing updated campus details
      * @return a {@link ResponseEntity} containing a {@link Mono} emitting the updated {@link CampusResponseDto}
      */
-    @Operation(summary = "Update an existing campus", description = "Updates the details of an existing campus.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Campus updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Campus not found")
-    })
+    @Operation(summary = "Update an existing campus", description = "Updates the details of an existing campus.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Campus updated successfully"),
+                    @ApiResponse(responseCode = "404", description = "Campus not found")
+            })
     @PutMapping("/updateCampus")
-    public ResponseEntity<Mono<CampusResponseDto>> updateCampus(
+    public Mono<Optional<CampusResponseDto>> updateCampus(
             @Parameter(description = "ID of the campus to be updated") @RequestParam String campusId,
             @Parameter(description = "Updated campus details") @RequestBody CampusRequestDto campusRequestDto) {
-        return ResponseEntity.ok().body(campusService.updateCampus(campusId, campusRequestDto));
+        return processTheResultFromService(campusService.updateCampus(campusId, campusRequestDto));
     }
 
     /**
@@ -104,14 +108,15 @@ public class CampusController {
      * @param campusId the unique identifier of the campus to delete
      * @return a {@link ResponseEntity} containing a {@link Mono} that completes when the deletion is done
      */
-    @Operation(summary = "Delete a campus by its ID", description = "Removes a campus from the system using its unique identifier.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Campus deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Campus not found")
-    })
+    @Operation(summary = "Delete a campus by its ID", description = "Removes a campus from the system using its unique identifier.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Campus deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Campus not found")
+            })
     @DeleteMapping("/deleteCampus")
-    public ResponseEntity<Mono<Void>> deleteCampus(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> deleteCampus(
             @Parameter(description = "ID of the campus to be deleted") @RequestParam String campusId) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(campusService.deleteCampus(campusId));
+        return processEmptyResponse(campusService.deleteCampus(campusId));
     }
 }

@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processEmptyResponse;
+import static com.example.stream.spring.courses.reactive.example.utility.ProcessResponses.processTheResultFromService;
+
 @RestController
 @RequestMapping("/department")
 public class DepartmentController {
@@ -23,24 +28,24 @@ public class DepartmentController {
     }
 
     @GetMapping("/getDepartmentById")
-    public Mono<DepartmentResponseDto> getDepartmentById(@RequestParam String departmentId) {
-        return departmentService.getDepartmentById(departmentId);
+    public Mono<Optional<DepartmentResponseDto>> getDepartmentById(@RequestParam String departmentId) {
+        return processTheResultFromService(departmentService.getDepartmentById(departmentId));
     }
-    
+
     @PostMapping("/addDepartment")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<DepartmentResponseDto> addDepartment(@RequestBody DepartmentRequestDto departmentRequestDto) {
-        return departmentService.createDepartment(departmentRequestDto);
+    public Mono<Optional<DepartmentResponseDto>> addDepartment(@RequestBody DepartmentRequestDto departmentRequestDto) {
+        return processTheResultFromService(departmentService.createDepartment(departmentRequestDto));
     }
 
     @PutMapping("/updateDepartment")
-    public Mono<DepartmentResponseDto> updateDepartment(@RequestParam String departmentId, @RequestBody DepartmentRequestDto requestDto) {
-        return departmentService.updateDepartment(departmentId, requestDto);
+    public Mono<Optional<DepartmentResponseDto>> updateDepartment(@RequestParam String departmentId, @RequestBody DepartmentRequestDto requestDto) {
+        return processTheResultFromService(departmentService.updateDepartment(departmentId, requestDto));
     }
 
     @DeleteMapping("/deleteDepartment")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteDepartment(@RequestParam String departmentId) {
-        return departmentService.deleteDepartment(departmentId);
+        return processEmptyResponse(departmentService.deleteDepartment(departmentId));
     }
 }

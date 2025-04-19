@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static com.example.stream.spring.courses.reactive.example.utility.UtilMono.createMonoWithError;
+
 /**
  * Service class that encapsulates the business logic related to {@link Building} entities.
  * It provides methods for managing building data, including creating, updating, retrieving, and deleting buildings.
@@ -87,7 +89,7 @@ public class BuildingService {
                 .flatMap(either -> either.getRight()
                         .map(present -> buildingRepository.save(buildingConverter.toEntity(newBuilding))
                                 .<Either<Error, BuildingResponseDto>>map(building -> Either.right(buildingConverter.toDto(building))))
-                        .orElse(Mono.just(Either.left(either.getLeft().orElse(new GenericError())))));
+                        .orElse(createMonoWithError(either)));
     }
 
     /**
@@ -102,7 +104,7 @@ public class BuildingService {
                         .<Mono<Either<Error, Success>>>map(building ->
                                 buildingRepository.deleteById(UUID.fromString(buildingId))
                                         .then(Mono.just(Either.right(new BuildingDeleteOk()))))
-                        .orElse(Mono.just(Either.left(either.getLeft().orElse(new GenericError())))));
+                        .orElse(createMonoWithError(either)));
     }
 
     /**
@@ -111,7 +113,7 @@ public class BuildingService {
      * @param buildingId the UUID string of the building
      * @return a {@link Mono} of {@link Either} containing true if found or an error if not
      */
-    private Mono<Either<Error, Boolean>> existBuildingById(String buildingId) {
+    public Mono<Either<Error, Boolean>> existBuildingById(String buildingId) {
         return buildingRepository.existsById(UUID.fromString(buildingId))
                 .filter(Boolean::booleanValue)
                 .<Either<Error, Boolean>>map(Either::right)
@@ -165,7 +167,7 @@ public class BuildingService {
                             }
                             return saveOrUpdateBuilding(existingBuilding, building);
                         })
-                        .orElse(Mono.just(Either.left(either.getLeft().orElse(new GenericError())))));
+                        .orElse(createMonoWithError(either)));
     }
 
     /**

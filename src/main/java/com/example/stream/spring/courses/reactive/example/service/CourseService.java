@@ -2,28 +2,30 @@ package com.example.stream.spring.courses.reactive.example.service;
 
 import com.example.stream.spring.courses.reactive.example.converter.CourseConverter;
 import com.example.stream.spring.courses.reactive.example.entity.Course;
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.*;
 import com.example.stream.spring.courses.reactive.example.model.request.CourseRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.CourseResponseDto;
 import com.example.stream.spring.courses.reactive.example.repository.CourseRepository;
-import com.example.stream.spring.courses.reactive.example.repository.DepartmentRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static com.example.stream.spring.courses.reactive.example.utility.UtilMono.createMonoWithError;
+
 @Service
 public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseConverter converter;
-    private final DepartmentRepository departmentRepository;
+    private final DepartmentService departmentService;
 
-    public CourseService(CourseRepository courseRepository, CourseConverter converter, DepartmentRepository departmentRepository) {
+    public CourseService(CourseRepository courseRepository, CourseConverter converter, DepartmentService departmentService) {
         this.courseRepository = courseRepository;
         this.converter = converter;
-        this.departmentRepository = departmentRepository;
+        this.departmentService = departmentService;
     }
 
     private static Course updateCourse(Course course, CourseRequestDto courseRequestDto) {
@@ -41,44 +43,53 @@ public class CourseService {
                 .map(converter::toDto);
     }
 
-    public Mono<CourseResponseDto> addCourse(CourseRequestDto courseDto) {
-        return departmentRepository.findById(UUID.fromString(courseDto.departmentId()))
-                .flatMap(department -> courseRepository.save(converter.toEntity(courseDto))
-                        .map(converter::toDto))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The department is not found")));
+    public Mono<Either<Error, CourseResponseDto>> addCourse(CourseRequestDto courseDto) {
+        return departmentService.existDepartmentById(courseDto.departmentId())
+                .flatMap(either -> either.getRight()
+                        .map(result -> courseRepository.save(converter.toEntity(courseDto))
+                                .<Either<Error, CourseResponseDto>>map(course -> Either.right(converter.toDto(course))))
+                        .orElse(createMonoWithError(either)));
     }
 
-    private Mono<Course> getCourseById(String courseId) {
-        return courseRepository.findById(UUID.fromString(courseId));
+    private Mono<Either<Error, Course>> retrieveCourseById(String courseId) {
+        return courseRepository.findById(UUID.fromString(courseId))
+                .<Either<Error, Course>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new CourseNotFound())));
     }
 
-    private Mono<Boolean> existDepartment(String departmentId) {
-        return departmentRepository.existsById(UUID.fromString(departmentId));
+    public Mono<Either<Error, CourseResponseDto>> updateCourse(String courseId, CourseRequestDto courseDto) {
+        return retrieveCourseById(courseId)
+                .flatMap(either -> either.getRight()
+                        .map(course -> departmentService.existDepartmentById(courseDto.departmentId())
+                                .flatMap(ignored -> courseRepository.save(updateCourse(course, courseDto))
+                                        .<Either<Error, CourseResponseDto>>map(course1 -> Either.right(converter.toDto(course1)))))
+                        .orElse(createMonoWithError(either)));
     }
 
-    public Mono<CourseResponseDto> updateCourse(String courseId, CourseRequestDto courseDto) {
-        return getCourseById(courseId)
-                .flatMap(course -> existDepartment(courseDto.departmentId())
-                        .filter(departmentExists -> departmentExists)
-                        .flatMap(departmentExists -> courseRepository.save(updateCourse(course, courseDto))
-                                .map(converter::toDto)
-                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The department is not found")))))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "The course is not found")));
+    private Mono<Either<Error, Boolean>> existCourseById(String campusId) {
+        return courseRepository.existsById(UUID.fromString(campusId))
+                .filter(Boolean::booleanValue)
+                .<Either<Error, Boolean>>map(Either::right)
+                .switchIfEmpty(Mono.just(Either.left(new BuildingNotFound())));
     }
 
-    public Mono<Void> delete(String idCourse) {
-        return courseRepository.deleteById(UUID.fromString(idCourse));
+    public Mono<Either<Error, Success>> deleteCourseById(String idCourse) {
+        return existCourseById(idCourse)
+                .flatMap(either -> either.getRight()
+                        .<Mono<Either<Error, Success>>>map(building ->
+                                courseRepository.deleteById(UUID.fromString(idCourse))
+                                        .then(Mono.just(Either.right(new CourseDeleteOk()))))
+                        .orElse(createMonoWithError(either)));
     }
 
-    public Mono<CourseResponseDto> getCourse(String courseId) {
-        return getCourseById(courseId)
-                .map(converter::toDto);
+    public Mono<Either<Error, CourseResponseDto>> getCourseById(String courseId) {
+        return retrieveCourseById(courseId)
+                .map(errorCourseEither -> errorCourseEither.map(converter::toDto));
     }
 
     public Flux<CourseResponseDto> getCourseByDepartmentId(String departmentId) {
         return courseRepository.findByDepartmentId(UUID.fromString(departmentId))
                 .map(converter::toDto);
-
     }
 }
 

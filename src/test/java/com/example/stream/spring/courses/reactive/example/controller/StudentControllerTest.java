@@ -105,7 +105,7 @@ class StudentControllerTest {
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("The student is not found");
+                .jsonPath("$.message").isEqualTo("Student not found");
     }
 
     @Test
