@@ -1,5 +1,10 @@
 package com.example.stream.spring.courses.reactive.example.controller;
 
+import com.example.stream.spring.courses.reactive.example.functional.Either;
+import com.example.stream.spring.courses.reactive.example.model.error.BuildingNotFound;
+import com.example.stream.spring.courses.reactive.example.model.error.Error;
+import com.example.stream.spring.courses.reactive.example.model.error.GenericError;
+import com.example.stream.spring.courses.reactive.example.model.error.Success;
 import com.example.stream.spring.courses.reactive.example.model.request.BuildingRequestDto;
 import com.example.stream.spring.courses.reactive.example.model.response.BuildingResponseDto;
 import com.example.stream.spring.courses.reactive.example.service.BuildingService;
@@ -13,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 /**
  * REST controller for managing building-related operations.
@@ -33,6 +40,26 @@ public class BuildingController {
         this.buildingService = buildingService;
     }
 
+    private static Mono<Optional<BuildingResponseDto>> processTheResultFromService(Mono<Either<Error, BuildingResponseDto>> building) {
+        return building
+                .flatMap(errorBuildingResponseDtoEither ->
+                        switch (errorBuildingResponseDtoEither) {
+                            case Either.Left<Error, BuildingResponseDto> left ->
+                                    checkLeft(left.getLeft().orElse(new GenericError()));
+                            case Either.Right<Error, BuildingResponseDto> right -> Mono.just(right.getRight());
+                        });
+    }
+
+    private static <T> Mono<T> checkLeft(Error error) {
+        return switch (error) {
+            case BuildingNotFound ignored ->
+                    Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Building not found"));
+            case GenericError ignored ->
+                    Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Generic error find"));
+            default -> Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request contains an error"));
+        };
+    }
+
     /**
      * Retrieves all buildings.
      *
@@ -51,15 +78,15 @@ public class BuildingController {
      * @param buildingId the unique identifier of the building
      * @return a {@link Mono} emitting the {@link BuildingResponseDto} if found
      */
-    @Operation(summary = "Retrieve a building by its ID", description = "Fetches a building's details using its unique identifier.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Building found"),
-            @ApiResponse(responseCode = "404", description = "Building not found")
-    })
+    @Operation(summary = "Retrieve a building by its ID", description = "Fetches a building's details using its unique identifier.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Building found"),
+                    @ApiResponse(responseCode = "404", description = "Building not found")
+            })
     @GetMapping("/getBuildingById")
-    public Mono<BuildingResponseDto> getBuildingById(
+    public Mono<Optional<BuildingResponseDto>> getBuildingById(
             @Parameter(description = "ID of the building to be retrieved") @RequestParam String buildingId) {
-        return buildingService.getBuildingById(buildingId);
+        return processTheResultFromService(buildingService.getBuildingById(buildingId));
     }
 
     /**
@@ -68,17 +95,17 @@ public class BuildingController {
      * @param buildingRequestDto the data transfer object containing building details
      * @return a {@link Mono} emitting the created {@link BuildingResponseDto}
      */
-    @Operation(summary = "Add a new building", description = "Creates a new building with the provided details.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Building created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Add a new building", description = "Creates a new building with the provided details.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Building created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input")
+            })
     @PostMapping("/addBuilding")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<BuildingResponseDto> createBuilding(@Parameter(description = "Building details for the new building")
-                                                    @RequestBody BuildingRequestDto buildingRequestDto) {
-        return buildingService.createBuilding(buildingRequestDto)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST)));
+    public Mono<Optional<BuildingResponseDto>> createBuilding(@Parameter(description = "Building details for the new building")
+                                                              @RequestBody BuildingRequestDto buildingRequestDto) {
+        return processTheResultFromService(buildingService.createBuilding(buildingRequestDto));
+
     }
 
     /**
@@ -95,7 +122,13 @@ public class BuildingController {
     @DeleteMapping("/deleteBuilding")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBuilding(@Parameter(description = "ID of the building to be deleted") @RequestParam String buildingId) {
-        return buildingService.deleteBuilding(buildingId);
+        return buildingService.deleteBuilding(buildingId)
+                .flatMap(errorBuildingResponseDtoEither ->
+                        switch (errorBuildingResponseDtoEither) {
+                            case Either.Left<Error, Success> left ->
+                                    checkLeft(left.getLeft().orElse(new GenericError()));
+                            case Either.Right<Error, Success> ignored -> Mono.empty();
+                        });
     }
 
     /**
@@ -111,10 +144,9 @@ public class BuildingController {
             @ApiResponse(responseCode = "404", description = "Building not found")
     })
     @PutMapping("/updateBuilding")
-    public Mono<BuildingResponseDto> updateBuilding(
+    public Mono<Optional<BuildingResponseDto>> updateBuilding(
             @Parameter(description = "ID of the building to be updated") @RequestParam String buildingId,
             @Parameter(description = "Updated building details") @RequestBody BuildingRequestDto buildingRequestDto) {
-        return buildingService.updateBuilding(buildingId, buildingRequestDto)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        return processTheResultFromService(buildingService.updateBuilding(buildingId, buildingRequestDto));
     }
 }

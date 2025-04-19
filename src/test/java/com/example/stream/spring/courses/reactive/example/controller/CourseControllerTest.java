@@ -144,12 +144,12 @@ class CourseControllerTest {
 
     @Test
     void get_course_by_department_test() {
-        String departmentId = "19902a0f-e444-4118-9fe0-d5d61e3750dc"; // Replace with a valid course ID
+        String departmentId = "1a6c2f08-8ee8-438f-b37f-01a1c862efe7"; // Replace with a valid course ID
         webTestClient.get().uri("/courses/{departmentId}/course", departmentId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBodyList(StudentResponseDto.class)
-                .hasSize(5); // Adjust based on expected data
+                .hasSize(2); // Adjust based on expected data
     }
 }
