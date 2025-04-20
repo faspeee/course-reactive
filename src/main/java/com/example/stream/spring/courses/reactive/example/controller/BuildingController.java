@@ -6,7 +6,6 @@ import com.example.stream.spring.courses.reactive.example.service.BuildingServic
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -92,11 +91,11 @@ public class BuildingController {
      * @param buildingId the unique identifier of the building to delete
      * @return a {@link Mono} that completes when the deletion is done
      */
-    @Operation(summary = "Delete a building by its ID", description = "Removes a building from the system using its unique identifier.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Building deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Building not found")
-    })
+    @Operation(summary = "Delete a building by its ID", description = "Removes a building from the system using its unique identifier.",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Building deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Building not found")
+            })
     @DeleteMapping("/deleteBuilding")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBuilding(@Parameter(description = "ID of the building to be deleted") @RequestParam String buildingId) {
@@ -110,11 +109,11 @@ public class BuildingController {
      * @param buildingRequestDto the data transfer object containing updated building details
      * @return a {@link Mono} emitting the updated {@link BuildingResponseDto}
      */
-    @Operation(summary = "Update an existing building", description = "Updates the details of an existing building.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Building updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Building not found")
-    })
+    @Operation(summary = "Update an existing building", description = "Updates the details of an existing building.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Building updated successfully"),
+                    @ApiResponse(responseCode = "404", description = "Building not found")
+            })
     @PutMapping("/updateBuilding")
     public Mono<Optional<BuildingResponseDto>> updateBuilding(
             @Parameter(description = "ID of the building to be updated") @RequestParam String buildingId,

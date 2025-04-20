@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,13 +60,13 @@ public class ClassroomController {
      * @param classroomId the unique identifier of the classroom
      * @return a {@link Mono} emitting the {@link ClassroomResponseDto} if found
      */
-    @Operation(summary = "Retrieve a classroom by ID", description = "Fetches a classroom based on its unique identifier.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the classroom",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClassroomResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "classroom not found")
-    })
+    @Operation(summary = "Retrieve a classroom by ID", description = "Fetches a classroom based on its unique identifier.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully retrieved the classroom",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ClassroomResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "classroom not found")
+            })
     @GetMapping(value = "/getClassroom", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<Optional<ClassroomResponseDto>> getClassroom(
             @Parameter(description = "ID of the classroom to be retrieved") @RequestParam("classroomId") String classroomId) {
@@ -97,13 +96,13 @@ public class ClassroomController {
      * @param classroomRequestDto the data transfer object containing updated classroom details
      * @return a {@link Mono} emitting the updated {@link ClassroomResponseDto}
      */
-    @Operation(summary = "Update an existing classroom", description = "Updates the details of an existing classroom.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Classroom successfully updated",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ClassroomResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Classroom not found")
-    })
+    @Operation(summary = "Update an existing classroom", description = "Updates the details of an existing classroom.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Classroom successfully updated",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ClassroomResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Classroom not found")
+            })
     @PutMapping(value = "/updateClassroom", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<Optional<ClassroomResponseDto>> updateClassroom(
             @Parameter(description = "Updated classroom details") @RequestBody ClassroomRequestDto classroomRequestDto,
